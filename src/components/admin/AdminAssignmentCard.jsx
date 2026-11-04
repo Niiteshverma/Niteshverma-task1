@@ -1,4 +1,12 @@
-export default function AdminAssignmentCard({ assignment, totalStudentsCount = 5, onEdit, onDelete }) {
+import StudentStatusList from './StudentStatusList'
+
+export default function AdminAssignmentCard({
+  assignment,
+  allStudents = [],
+  getStudentSubmission,
+  onEdit,
+  onDelete,
+}) {
   // Format readable due date (e.g. "Oct 15, 2026")
   const formatDueDate = (dateString) => {
     if (!dateString) return 'No due date'
@@ -17,27 +25,28 @@ export default function AdminAssignmentCard({ assignment, totalStudentsCount = 5
   }
 
   const assignedCount = assignment.assignedTo ? assignment.assignedTo.length : 0
-  const isAllStudents = assignedCount === totalStudentsCount
+  const isAllStudents = assignedCount === allStudents.length
 
   return (
-    <article className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 transition flex flex-col justify-between">
-      <div>
-        <div className="flex items-start justify-between gap-3 mb-2">
+    <article className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 transition flex flex-col justify-between space-y-4">
+      <div className="space-y-3">
+        {/* Title & Scope Badge */}
+        <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold text-slate-800 text-base leading-snug">
             {assignment.title}
           </h3>
-          <span className="shrink-0 text-xs px-2.5 py-0.5 rounded-full font-medium bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="shrink-0 text-xs px-2.5 py-0.5 rounded-full font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
             {isAllStudents ? 'All students' : `${assignedCount} students`}
           </span>
         </div>
 
-        <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+        {/* Description */}
+        <p className="text-slate-600 text-sm line-clamp-3">
           {assignment.description || 'No description provided.'}
         </p>
-      </div>
 
-      <div className="pt-3 border-t border-slate-100 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+        {/* Due Date & Drive Link */}
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-2">
           <div className="text-slate-500">
             <span className="font-medium text-slate-700">Due: </span>
             {formatDueDate(assignment.dueDate)}
@@ -57,30 +66,32 @@ export default function AdminAssignmentCard({ assignment, totalStudentsCount = 5
             </a>
           )}
         </div>
+      </div>
 
-        {/* Action Buttons (Edit / Delete wired for Phase 7 if provided) */}
-        {(onEdit || onDelete) && (
-          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
-            {onEdit && (
-              <button
-                type="button"
-                onClick={() => onEdit(assignment)}
-                className="px-2.5 py-1 text-xs font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 border border-slate-200 rounded transition"
-              >
-                Edit
-              </button>
-            )}
-            {onDelete && (
-              <button
-                type="button"
-                onClick={() => onDelete(assignment)}
-                className="px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded transition"
-              >
-                Delete
-              </button>
-            )}
-          </div>
-        )}
+      {/* Student Submissions Tracking Section */}
+      <StudentStatusList
+        assignedStudentIds={assignment.assignedTo || []}
+        assignmentId={assignment.id}
+        allStudents={allStudents}
+        getStudentSubmission={getStudentSubmission}
+      />
+
+      {/* Card Actions: Edit & Delete */}
+      <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+        <button
+          type="button"
+          onClick={() => onEdit(assignment)}
+          className="px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 border border-slate-200 rounded-lg transition"
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(assignment)}
+          className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg transition"
+        >
+          Delete
+        </button>
       </div>
     </article>
   )

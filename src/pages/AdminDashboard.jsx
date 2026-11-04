@@ -9,17 +9,26 @@ import { initialUsers } from '../data/seedData'
 
 export default function AdminDashboard() {
   const { currentUser } = useAuth()
-  const { getAdminAssignments, createAssignment } = useData()
+  const {
+    getAdminAssignments,
+    getStudentSubmission,
+    createAssignment,
+    updateAssignment,
+    deleteAssignment,
+  } = useData()
 
-  // Modal open/close state for creating an assignment
+  // Modal states for Create, Edit, and Delete confirmation
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [assignmentToEdit, setAssignmentToEdit] = useState(null)
+  const [assignmentToDelete, setAssignmentToDelete] = useState(null)
 
-  // Students list from seed users for assignment targeting
+  // Students list from seed users for assignment targeting and status tracking
   const students = initialUsers.filter((u) => u.role === 'student')
 
   // Retrieve only assignments created by this logged-in admin
   const adminAssignments = currentUser ? getAdminAssignments(currentUser.id) : []
 
+  // Create submission handler
   const handleCreateSubmit = (formData) => {
     if (!currentUser) return
     createAssignment({
@@ -27,6 +36,20 @@ export default function AdminDashboard() {
       createdBy: currentUser.id,
     })
     setIsCreateOpen(false)
+  }
+
+  // Edit submission handler
+  const handleEditSubmit = (formData) => {
+    if (!assignmentToEdit) return
+    updateAssignment(assignmentToEdit.id, formData)
+    setAssignmentToEdit(null)
+  }
+
+  // Confirm delete handler
+  const handleConfirmDelete = () => {
+    if (!assignmentToDelete) return
+    deleteAssignment(assignmentToDelete.id)
+    setAssignmentToDelete(null)
   }
 
   return (
@@ -41,7 +64,7 @@ export default function AdminDashboard() {
               Welcome, {currentUser?.name}!
             </h2>
             <p className="text-sm text-slate-500 mt-1">
-              Admin Workspace &bull; Create assignments and track student submissions.
+              Admin Workspace &bull; Manage assignments, monitor progress, and review student submissions.
             </p>
           </div>
 
@@ -79,12 +102,15 @@ export default function AdminDashboard() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {adminAssignments.map((assignment) => (
                 <AdminAssignmentCard
                   key={assignment.id}
                   assignment={assignment}
-                  totalStudentsCount={students.length}
+                  allStudents={students}
+                  getStudentSubmission={getStudentSubmission}
+                  onEdit={(item) => setAssignmentToEdit(item)}
+                  onDelete={(item) => setAssignmentToDelete(item)}
                 />
               ))}
             </div>
@@ -104,6 +130,64 @@ export default function AdminDashboard() {
           onSubmit={handleCreateSubmit}
           students={students}
         />
+      </Modal>
+
+      {/* Edit Assignment Modal */}
+      <Modal
+        isOpen={Boolean(assignmentToEdit)}
+        onClose={() => setAssignmentToEdit(null)}
+        title="Edit Assignment"
+      >
+        {assignmentToEdit && (
+          <AssignmentForm
+            isOpen={Boolean(assignmentToEdit)}
+            initialData={assignmentToEdit}
+            onClose={() => setAssignmentToEdit(null)}
+            onSubmit={handleEditSubmit}
+            students={students}
+          />
+        )}
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(assignmentToDelete)}
+        onClose={() => setAssignmentToDelete(null)}
+        title="Confirm Delete Assignment"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600">
+            Are you sure you want to delete this assignment?
+          </p>
+
+          {assignmentToDelete && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
+              <p className="font-semibold text-red-900">
+                {assignmentToDelete.title}
+              </p>
+              <p className="text-xs text-red-700 mt-1">
+                This will permanently delete the assignment and all associated student submission records.
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end space-x-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setAssignmentToDelete(null)}
+              className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition shadow-sm"
+            >
+              Yes, Delete Assignment
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   )

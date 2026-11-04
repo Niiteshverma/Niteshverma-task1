@@ -56,6 +56,35 @@ export function DataProvider({ children }) {
     return newAssignment
   }
 
+  // Update an existing assignment and clean up unassigned student submissions
+  const updateAssignment = (assignmentId, updatedData) => {
+    setAssignments((prevAssignments) =>
+      prevAssignments.map((assignment) =>
+        assignment.id === assignmentId ? { ...assignment, ...updatedData } : assignment
+      )
+    )
+
+    // If assigned students changed, prune any leftover submissions for unassigned students
+    if (updatedData.assignedTo) {
+      setSubmissions((prevSubmissions) =>
+        prevSubmissions.filter(
+          (sub) =>
+            sub.assignmentId !== assignmentId || updatedData.assignedTo.includes(sub.studentId)
+        )
+      )
+    }
+  }
+
+  // Delete an assignment and cascade remove its associated submissions
+  const deleteAssignment = (assignmentId) => {
+    setAssignments((prevAssignments) =>
+      prevAssignments.filter((assignment) => assignment.id !== assignmentId)
+    )
+    setSubmissions((prevSubmissions) =>
+      prevSubmissions.filter((sub) => sub.assignmentId !== assignmentId)
+    )
+  }
+
   return (
     <DataContext.Provider
       value={{
@@ -68,6 +97,8 @@ export function DataProvider({ children }) {
         getAdminAssignments,
         submitAssignment,
         createAssignment,
+        updateAssignment,
+        deleteAssignment,
       }}
     >
       {children}

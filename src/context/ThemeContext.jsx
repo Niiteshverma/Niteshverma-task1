@@ -1,12 +1,14 @@
+// Context providing light/dark theme preference synced with localStorage
 import { createContext, useContext, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { STORAGE_KEYS } from '../utils/constants'
 
 const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useLocalStorage('theme', 'light')
+  const [theme, setTheme] = useLocalStorage(STORAGE_KEYS.THEME, 'light')
 
-  // Keep the <html> class in sync with the theme state
+  // Keep the <html> dark class synchronized with state
   useEffect(() => {
     const root = document.documentElement
     if (theme === 'dark') {
@@ -34,4 +36,3 @@ export function useTheme() {
   }
   return context
 }
-

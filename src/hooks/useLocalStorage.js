@@ -1,17 +1,13 @@
+// Custom hook that syncs state with localStorage and listens to changes across tabs
 import { useState, useEffect } from 'react'
 
-/**
- * Custom hook to synchronize state with localStorage.
- * - Reads on load with fallback to initialValue if empty or corrupted.
- * - Saves on state change.
- * - Listens for external changes across browser tabs.
- */
 export function useLocalStorage(key, initialValue, onError) {
+  // Read saved value on mount with fallback to initialValue
   const [value, setValue] = useState(() => {
     try {
-      const item = localStorage.getItem(key)
-      if (item !== null) {
-        return JSON.parse(item)
+      const saved = localStorage.getItem(key)
+      if (saved !== null) {
+        return JSON.parse(saved)
       }
     } catch (error) {
       console.warn(`Error reading localStorage key "${key}":`, error)
@@ -20,7 +16,7 @@ export function useLocalStorage(key, initialValue, onError) {
     return typeof initialValue === 'function' ? initialValue() : initialValue
   })
 
-  // Synchronize state changes to localStorage
+  // Save changes to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(value))
@@ -30,20 +26,20 @@ export function useLocalStorage(key, initialValue, onError) {
     }
   }, [key, value, onError])
 
-  // Multi-tab synchronization: listen for changes made in other tabs
+  // Sync state if localStorage is changed in another browser tab
   useEffect(() => {
-    const handleStorageEvent = (event) => {
+    const handleStorageChange = (event) => {
       if (event.key === key && event.newValue !== null) {
         try {
           setValue(JSON.parse(event.newValue))
         } catch (error) {
-          console.warn(`Error parsing storage event for key "${key}":`, error)
+          console.warn(`Error parsing storage event for "${key}":`, error)
         }
       }
     }
 
-    window.addEventListener('storage', handleStorageEvent)
-    return () => window.removeEventListener('storage', handleStorageEvent)
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
   }, [key])
 
   return [value, setValue]

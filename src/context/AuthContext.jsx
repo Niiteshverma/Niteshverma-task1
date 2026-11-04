@@ -1,33 +1,20 @@
-import { createContext, useContext, useMemo } from 'react'
+// Context providing current user authentication and role state
+import { createContext, useContext } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { ROLES, STORAGE_KEYS } from '../utils/constants'
 
 const AuthContext = createContext(null)
 
-// Validate that a user object has the expected schema and role
-function isValidUser(user) {
-  return (
-    user !== null &&
-    typeof user === 'object' &&
-    typeof user.id === 'string' &&
-    user.id.trim().length > 0 &&
-    typeof user.name === 'string' &&
-    (user.role === 'student' || user.role === 'admin')
-  )
-}
-
 export function AuthProvider({ children }) {
-  const [storedUser, setStoredUser] = useLocalStorage('current_user', null)
+  const [storedUser, setStoredUser] = useLocalStorage(STORAGE_KEYS.USER, null)
 
-  // Ensure stored user is valid, otherwise treat as logged out
-  const currentUser = useMemo(() => {
-    return isValidUser(storedUser) ? storedUser : null
-  }, [storedUser])
+  // Validate that the stored user has a recognized role and id
+  const hasValidRole = storedUser && (storedUser.role === ROLES.STUDENT || storedUser.role === ROLES.ADMIN)
+  const currentUser = hasValidRole && storedUser.id ? storedUser : null
 
   const login = (user) => {
-    if (isValidUser(user)) {
+    if (user && user.id && (user.role === ROLES.STUDENT || user.role === ROLES.ADMIN)) {
       setStoredUser(user)
-    } else {
-      console.warn('Attempted to log in with invalid user object:', user)
     }
   }
 

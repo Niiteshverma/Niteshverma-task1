@@ -18,3 +18,4 @@ export const STORAGE_KEYS = {
 }
 
 export const LOADING_DELAY = 500
+

@@ -1,35 +1,35 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+// Context providing shared assignments and submissions state
+import { createContext, useContext, useState } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { initialAssignments, initialSubmissions } from '../data/seedData'
+import { STATUS, STORAGE_KEYS } from '../utils/constants'
 
 const DataContext = createContext(null)
 
 export function DataProvider({ children }) {
   const [storageError, setStorageError] = useState(null)
 
-  const handleStorageError = useCallback(() => {
-    setStorageError(
-      'Corrupted data detected in local storage. Click below to restore initial seed data.'
-    )
-  }, [])
+  const handleStorageError = () => {
+    setStorageError('Corrupted data detected in local storage. Click below to restore initial seed data.')
+  }
 
-  // Synchronize assignments and submissions with localStorage
+  // Persist assignments and submissions in localStorage
   const [assignments, setAssignments] = useLocalStorage(
-    'assignments',
+    STORAGE_KEYS.ASSIGNMENTS,
     initialAssignments,
     handleStorageError
   )
   const [submissions, setSubmissions] = useLocalStorage(
-    'submissions',
+    STORAGE_KEYS.SUBMISSIONS,
     initialSubmissions,
     handleStorageError
   )
 
-  // Reset corrupted data to initial seeds
+  // Reset corrupted storage back to original seed data
   const resetData = () => {
     try {
-      localStorage.setItem('assignments', JSON.stringify(initialAssignments))
-      localStorage.setItem('submissions', JSON.stringify(initialSubmissions))
+      localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(initialAssignments))
+      localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(initialSubmissions))
     } catch (e) {
       console.warn('Could not reset localStorage directly:', e)
     }
@@ -38,87 +38,80 @@ export function DataProvider({ children }) {
     setStorageError(null)
   }
 
-  // Find a specific student's submission for an assignment
+  // Find a specific student's submission record
   const getStudentSubmission = (assignmentId, studentId) => {
     return submissions.find(
       (sub) => sub.assignmentId === assignmentId && sub.studentId === studentId
     ) || null
   }
 
-  // Get all assignments assigned to a specific student
+  // Filter assignments assigned to a specific student
   const getStudentAssignments = (studentId) => {
-    return assignments.filter((assignment) =>
-      assignment.assignedTo && assignment.assignedTo.includes(studentId)
-    )
+    return assignments.filter((a) => a.assignedTo && a.assignedTo.includes(studentId))
   }
 
-  // Get all assignments created by a specific admin
+  // Filter assignments created by a specific admin
   const getAdminAssignments = (adminId) => {
-    return assignments.filter((assignment) => assignment.createdBy === adminId)
+    return assignments.filter((a) => a.createdBy === adminId)
   }
 
-  // Submit an assignment for a student (prevents duplicates)
+  // Submit an assignment for a student (prevents double submissions)
   const submitAssignment = (assignmentId, studentId) => {
-    setSubmissions((prevSubmissions) => {
-      const exists = prevSubmissions.some(
+    setSubmissions((prev) => {
+      const alreadySubmitted = prev.some(
         (sub) => sub.assignmentId === assignmentId && sub.studentId === studentId
       )
-      if (exists) return prevSubmissions
+      if (alreadySubmitted) return prev
 
       const newSubmission = {
         assignmentId,
         studentId,
-        status: 'Submitted',
+        status: STATUS.SUBMITTED,
         submittedAt: new Date().toISOString(),
       }
-      return [...prevSubmissions, newSubmission]
+      return [...prev, newSubmission]
     })
   }
 
-  // Create a new assignment with a generated UUID
+  // Create new assignment with a generated UUID
   const createAssignment = (assignmentData) => {
     const newAssignment = {
       ...assignmentData,
       id: crypto.randomUUID(),
     }
-    setAssignments((prevAssignments) => [...prevAssignments, newAssignment])
+    setAssignments((prev) => [...prev, newAssignment])
     return newAssignment
   }
 
-  // Update an existing assignment and clean up unassigned student submissions
+  // Update existing assignment and remove submissions of any unassigned students
   const updateAssignment = (assignmentId, updatedData, adminId) => {
-    setAssignments((prevAssignments) =>
-      prevAssignments.map((assignment) => {
-        if (assignment.id !== assignmentId) return assignment
-        if (adminId && assignment.createdBy !== adminId) {
-          return assignment
-        }
-        return { ...assignment, ...updatedData }
+    setAssignments((prev) =>
+      prev.map((a) => {
+        if (a.id !== assignmentId) return a
+        if (adminId && a.createdBy !== adminId) return a
+        return { ...a, ...updatedData }
       })
     )
 
     if (updatedData.assignedTo) {
-      setSubmissions((prevSubmissions) =>
-        prevSubmissions.filter(
-          (sub) =>
-            sub.assignmentId !== assignmentId || updatedData.assignedTo.includes(sub.studentId)
+      setSubmissions((prev) =>
+        prev.filter(
+          (sub) => sub.assignmentId !== assignmentId || updatedData.assignedTo.includes(sub.studentId)
         )
       )
     }
   }
 
-  // Delete an assignment and cascade remove its associated submissions
+  // Delete assignment and cascade remove its associated submissions
   const deleteAssignment = (assignmentId, adminId) => {
-    setAssignments((prevAssignments) =>
-      prevAssignments.filter((assignment) => {
-        if (assignment.id !== assignmentId) return true
-        if (adminId && assignment.createdBy !== adminId) return true
+    setAssignments((prev) =>
+      prev.filter((a) => {
+        if (a.id !== assignmentId) return true
+        if (adminId && a.createdBy !== adminId) return true
         return false
       })
     )
-    setSubmissions((prevSubmissions) =>
-      prevSubmissions.filter((sub) => sub.assignmentId !== assignmentId)
-    )
+    setSubmissions((prev) => prev.filter((sub) => sub.assignmentId !== assignmentId))
   }
 
   return (
@@ -144,7 +137,6 @@ export function DataProvider({ children }) {
   )
 }
 
-// Hook for convenient access to data state
 export function useData() {
   const context = useContext(DataContext)
   if (!context) {

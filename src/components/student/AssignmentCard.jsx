@@ -1,15 +1,14 @@
-import { formatDueDate, isAssignmentOverdue } from '../../utils/dateUtils'
-import { isValidHttpUrl } from '../../utils/urlUtils'
+import { formatDate, isOverdue, isValidUrl } from '../../utils/helpers'
 
 export default function AssignmentCard({ assignment, submission, onSubmitClick }) {
   const isSubmitted = submission?.status === 'Submitted'
-  const isOverdue = isAssignmentOverdue(assignment.dueDate, isSubmitted)
-  const hasValidDriveLink = isValidHttpUrl(assignment.driveLink)
+  const isAssignmentOverdue = isOverdue(assignment.dueDate, isSubmitted)
+  const hasValidDriveLink = isValidUrl(assignment.driveLink)
 
   return (
     <article
       className={`bg-white dark:bg-slate-900 rounded-xl border p-5 shadow-sm transition flex flex-col justify-between overflow-hidden break-words ${
-        isOverdue
+        isAssignmentOverdue
           ? 'border-red-300 dark:border-red-800/80 bg-red-50/10'
           : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
       }`}
@@ -21,7 +20,7 @@ export default function AssignmentCard({ assignment, submission, onSubmitClick }
           </h3>
 
           <div className="flex flex-col items-end gap-1 shrink-0">
-            {isOverdue && (
+            {isAssignmentOverdue && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
                 <span className="mr-1" aria-hidden="true">&#9888;</span> Overdue
               </span>
@@ -48,9 +47,9 @@ export default function AssignmentCard({ assignment, submission, onSubmitClick }
 
       <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className={`${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
+          <div className={`${isAssignmentOverdue ? 'text-red-600 dark:text-red-400 font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
             <span className="font-medium text-slate-700 dark:text-slate-300">Due: </span>
-            {formatDueDate(assignment.dueDate)}
+            {formatDate(assignment.dueDate)}
           </div>
 
           {hasValidDriveLink && (

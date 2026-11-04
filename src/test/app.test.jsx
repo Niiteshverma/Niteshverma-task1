@@ -228,22 +228,22 @@ describe('Assignment & Review Dashboard Test Suite', () => {
   })
 
   // 11. Overdue Date calculation: Due today is NOT overdue, past date is overdue, submitted is never overdue
-  it('isAssignmentOverdue handles dates safely without timezone bugs', async () => {
-    const { isAssignmentOverdue, getTodayDateString } = await import('../utils/dateUtils')
-    const today = getTodayDateString()
+  it('isOverdue handles dates safely without timezone bugs', async () => {
+    const { isOverdue, getTodayDate } = await import('../utils/helpers')
+    const today = getTodayDate()
 
     // Due today: NOT overdue
-    expect(isAssignmentOverdue(today, false)).toBe(false)
+    expect(isOverdue(today, false)).toBe(false)
 
     // Due yesterday: IS overdue if not submitted
     const yesterday = '2020-01-01'
-    expect(isAssignmentOverdue(yesterday, false)).toBe(true)
+    expect(isOverdue(yesterday, false)).toBe(true)
 
     // Due yesterday but marked submitted: NOT overdue
-    expect(isAssignmentOverdue(yesterday, true)).toBe(false)
+    expect(isOverdue(yesterday, true)).toBe(false)
 
     // Future date: NOT overdue
-    expect(isAssignmentOverdue('2099-12-31', false)).toBe(false)
+    expect(isOverdue('2099-12-31', false)).toBe(false)
   })
 
   // 12. Multi-tab sync: useLocalStorage updates when a storage event fires

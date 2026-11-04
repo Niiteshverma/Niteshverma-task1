@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { isValidHttpUrl } from '../../utils/urlUtils'
-import { getTodayDateString } from '../../utils/dateUtils'
+import { isValidUrl, getTodayDate } from '../../utils/helpers'
 
 export default function AssignmentForm({
   isOpen,
@@ -84,7 +83,7 @@ export default function AssignmentForm({
 
     if (!driveLink || !driveLink.trim()) {
       newErrors.driveLink = 'Drive link is required'
-    } else if (!isValidHttpUrl(driveLink)) {
+    } else if (!isValidUrl(driveLink)) {
       newErrors.driveLink = 'Please enter a valid web URL starting with http:// or https://'
     }
 
@@ -111,7 +110,7 @@ export default function AssignmentForm({
     })
   }
 
-  const isPastDueDate = Boolean(dueDate && dueDate < getTodayDateString())
+  const isPastDueDate = Boolean(dueDate && dueDate < getTodayDate())
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-left" noValidate>

@@ -1,6 +1,5 @@
 import StudentStatusList from './StudentStatusList'
-import { formatDueDate } from '../../utils/dateUtils'
-import { isValidHttpUrl } from '../../utils/urlUtils'
+import { formatDate, isValidUrl } from '../../utils/helpers'
 
 export default function AdminAssignmentCard({
   assignment,
@@ -11,7 +10,7 @@ export default function AdminAssignmentCard({
 }) {
   const assignedCount = assignment.assignedTo ? assignment.assignedTo.length : 0
   const isAllStudents = assignedCount === allStudents.length
-  const hasValidDriveLink = isValidHttpUrl(assignment.driveLink)
+  const hasValidDriveLink = isValidUrl(assignment.driveLink)
 
   return (
     <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between space-y-4 overflow-hidden break-words">
@@ -35,7 +34,7 @@ export default function AdminAssignmentCard({
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-2">
           <div className="text-slate-500 dark:text-slate-400">
             <span className="font-medium text-slate-700 dark:text-slate-300">Due: </span>
-            {formatDueDate(assignment.dueDate)}
+            {formatDate(assignment.dueDate)}
           </div>
 
           {hasValidDriveLink && (

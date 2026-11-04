@@ -1,0 +1,49 @@
+import { createContext, useContext } from 'react'
+import { useLocalStorage } from '../hooks/useLocalStorage'
+import { initialAssignments, initialSubmissions } from '../data/seedData'
+
+const DataContext = createContext(null)
+
+export function DataProvider({ children }) {
+  // Synchronize assignments and submissions with localStorage
+  const [assignments, setAssignments] = useLocalStorage('assignments', initialAssignments)
+  const [submissions, setSubmissions] = useLocalStorage('submissions', initialSubmissions)
+
+  // Find a specific student's submission for an assignment
+  const getStudentSubmission = (assignmentId, studentId) => {
+    return submissions.find(
+      (sub) => sub.assignmentId === assignmentId && sub.studentId === studentId
+    ) || null
+  }
+
+  // Get all assignments assigned to a specific student
+  const getStudentAssignments = (studentId) => {
+    return assignments.filter((assignment) =>
+      assignment.assignedTo && assignment.assignedTo.includes(studentId)
+    )
+  }
+
+  return (
+    <DataContext.Provider
+      value={{
+        assignments,
+        setAssignments,
+        submissions,
+        setSubmissions,
+        getStudentSubmission,
+        getStudentAssignments,
+      }}
+    >
+      {children}
+    </DataContext.Provider>
+  )
+}
+
+// Hook for convenient access to data state
+export function useData() {
+  const context = useContext(DataContext)
+  if (!context) {
+    throw new Error('useData must be used within a DataProvider')
+  }
+  return context
+}

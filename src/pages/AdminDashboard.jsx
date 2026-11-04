@@ -68,7 +68,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors">
       <Header />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
@@ -77,18 +77,18 @@ export default function AdminDashboard() {
           <ErrorState message={storageError} onReset={resetData} />
         ) : isLoading ? (
           /* Simulated Loading State */
-          <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
             <Loader message="Loading your assignments..." />
           </div>
         ) : (
           <>
             {/* Admin Header Section */}
-            <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-800">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">
                   Welcome, {currentUser?.name}!
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                   Admin Workspace &bull; Manage assignments, monitor progress, and review student submissions.
                 </p>
               </div>
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setIsCreateOpen(true)}
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition shrink-0"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition shrink-0"
               >
                 <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             {/* Assignments Section */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm sm:text-base font-semibold text-slate-800">
+                <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100">
                   Your Created Assignments ({adminAssignments.length})
                 </h3>
               </div>
@@ -177,16 +177,16 @@ export default function AdminDashboard() {
         title="Confirm Delete Assignment"
       >
         <div className="space-y-4">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Are you sure you want to delete this assignment?
           </p>
 
           {assignmentToDelete && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
-              <p className="font-semibold text-red-900">
+            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-850 rounded-lg p-3 text-sm">
+              <p className="font-semibold text-red-900 dark:text-red-200">
                 {assignmentToDelete.title}
               </p>
-              <p className="text-xs text-red-700 mt-1">
+              <p className="text-xs text-red-700 dark:text-red-400 mt-1">
                 This will permanently delete the assignment and all associated student submission records.
               </p>
             </div>
@@ -196,14 +196,14 @@ export default function AdminDashboard() {
             <button
               type="button"
               onClick={() => setAssignmentToDelete(null)}
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+              className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleConfirmDelete}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition shadow-sm"
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
             >
               Yes, Delete Assignment
             </button>

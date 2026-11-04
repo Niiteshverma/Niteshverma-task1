@@ -28,27 +28,27 @@ export default function AdminAssignmentCard({
   const isAllStudents = assignedCount === allStudents.length
 
   return (
-    <article className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 transition flex flex-col justify-between space-y-4">
+    <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between space-y-4">
       <div className="space-y-3">
         {/* Title & Scope Badge */}
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold text-slate-800 text-base leading-snug">
+          <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-snug">
             {assignment.title}
           </h3>
-          <span className="shrink-0 text-xs px-2.5 py-0.5 rounded-full font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+          <span className="shrink-0 text-xs px-2.5 py-0.5 rounded-full font-medium bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">
             {isAllStudents ? 'All students' : `${assignedCount} students`}
           </span>
         </div>
 
         {/* Description */}
-        <p className="text-slate-600 text-sm line-clamp-3">
+        <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3">
           {assignment.description || 'No description provided.'}
         </p>
 
         {/* Due Date & Drive Link */}
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-2">
-          <div className="text-slate-500">
-            <span className="font-medium text-slate-700">Due: </span>
+          <div className="text-slate-500 dark:text-slate-400">
+            <span className="font-medium text-slate-700 dark:text-slate-300">Due: </span>
             {formatDueDate(assignment.dueDate)}
           </div>
 
@@ -57,7 +57,7 @@ export default function AdminAssignmentCard({
               href={assignment.driveLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center font-medium text-indigo-600 hover:text-indigo-800 hover:underline"
+              className="inline-flex items-center font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
             >
               Drive Materials
               <svg className="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,18 +77,18 @@ export default function AdminAssignmentCard({
       />
 
       {/* Card Actions: Edit & Delete */}
-      <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+      <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
         <button
           type="button"
           onClick={() => onEdit(assignment)}
-          className="px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 border border-slate-200 rounded-lg transition"
+          className="px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
         >
           Edit
         </button>
         <button
           type="button"
           onClick={() => onDelete(assignment)}
-          className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg transition"
+          className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition"
         >
           Delete
         </button>

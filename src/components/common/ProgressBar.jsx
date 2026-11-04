@@ -5,7 +5,7 @@ export default function ProgressBar({ value = 0, max = 0, className = '' }) {
   return (
     <div className={`w-full ${className}`}>
       <div
-        className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden"
+        className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden"
         role="progressbar"
         aria-valuenow={percentage}
         aria-valuemin="0"
@@ -13,11 +13,10 @@ export default function ProgressBar({ value = 0, max = 0, className = '' }) {
         aria-label="Progress bar"
       >
         <div
-          className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+          className="bg-indigo-600 dark:bg-indigo-500 h-2.5 rounded-full transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>
     </div>
   )
 }
-

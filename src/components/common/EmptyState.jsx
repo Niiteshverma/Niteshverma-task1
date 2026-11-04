@@ -5,8 +5,8 @@ export default function EmptyState({
   onAction,
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-8 sm:p-12 text-center max-w-lg mx-auto space-y-4">
-      <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 p-8 sm:p-12 text-center max-w-lg mx-auto space-y-4">
+      <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 mx-auto flex items-center justify-center">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
@@ -18,15 +18,15 @@ export default function EmptyState({
       </div>
 
       <div className="space-y-1">
-        <h3 className="text-base font-semibold text-slate-800">{title}</h3>
-        <p className="text-sm text-slate-500 max-w-sm mx-auto">{description}</p>
+        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">{title}</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">{description}</p>
       </div>
 
       {actionLabel && onAction && (
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
+          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
         >
           {actionLabel}
         </button>

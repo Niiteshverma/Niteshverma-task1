@@ -59,7 +59,6 @@ export default function AssignmentForm({
         ? prev.filter((id) => id !== studentId)
         : [...prev, studentId]
       
-      // If user selected all individually, check "all"
       setAssignToAll(updated.length === students.length)
 
       if (updated.length > 0 && errors.assignedTo) {
@@ -121,7 +120,7 @@ export default function AssignmentForm({
     <form onSubmit={handleSubmit} className="space-y-4 text-left">
       {/* Title Field */}
       <div>
-        <label htmlFor="assignment-title" className="block text-xs font-semibold text-slate-700 mb-1">
+        <label htmlFor="assignment-title" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
           Assignment Title <span className="text-red-500">*</span>
         </label>
         <input
@@ -133,18 +132,18 @@ export default function AssignmentForm({
             if (errors.title) setErrors((prev) => ({ ...prev, title: '' }))
           }}
           placeholder="e.g. CS101: Introduction to Algorithms"
-          className={`w-full px-3 py-2 text-sm rounded-lg border ${
-            errors.title ? 'border-red-400 bg-red-50/30' : 'border-slate-300'
+          className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
+            errors.title ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
           } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
         />
         {errors.title && (
-          <p className="text-xs text-red-600 mt-1">{errors.title}</p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.title}</p>
         )}
       </div>
 
       {/* Description Field */}
       <div>
-        <label htmlFor="assignment-desc" className="block text-xs font-semibold text-slate-700 mb-1">
+        <label htmlFor="assignment-desc" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
           Description
         </label>
         <textarea
@@ -153,14 +152,14 @@ export default function AssignmentForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Provide instructions, expectations, and grading details..."
-          className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
 
       {/* Due Date & Drive Link Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label htmlFor="assignment-due" className="block text-xs font-semibold text-slate-700 mb-1">
+          <label htmlFor="assignment-due" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
             Due Date <span className="text-red-500">*</span>
           </label>
           <input
@@ -171,18 +170,18 @@ export default function AssignmentForm({
               setDueDate(e.target.value)
               if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }))
             }}
-            className={`w-full px-3 py-2 text-sm rounded-lg border ${
-              errors.dueDate ? 'border-red-400 bg-red-50/30' : 'border-slate-300'
+            className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
+              errors.dueDate ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
             } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
           />
           {errors.dueDate && (
-            <p className="text-xs text-red-600 mt-1">{errors.dueDate}</p>
+            <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.dueDate}</p>
           )}
         </div>
 
         <div>
-          <label htmlFor="assignment-drive" className="block text-xs font-semibold text-slate-700 mb-1">
-            Google Drive Materials Link <span className="text-red-500">*</span>
+          <label htmlFor="assignment-drive" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Drive Materials Link <span className="text-red-500">*</span>
           </label>
           <input
             id="assignment-drive"
@@ -193,33 +192,33 @@ export default function AssignmentForm({
               if (errors.driveLink) setErrors((prev) => ({ ...prev, driveLink: '' }))
             }}
             placeholder="https://drive.google.com/..."
-            className={`w-full px-3 py-2 text-sm rounded-lg border ${
-              errors.driveLink ? 'border-red-400 bg-red-50/30' : 'border-slate-300'
+            className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
+              errors.driveLink ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
             } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
           />
           {errors.driveLink && (
-            <p className="text-xs text-red-600 mt-1">{errors.driveLink}</p>
+            <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.driveLink}</p>
           )}
         </div>
       </div>
 
-      {/* Student Assignment Assignment Selection */}
-      <div className="pt-2 border-t border-slate-200">
+      {/* Student Assignment Selection */}
+      <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
         <label className="flex items-center space-x-2 cursor-pointer mb-2">
           <input
             type="checkbox"
             checked={assignToAll}
             onChange={handleToggleAll}
-            className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+            className="w-4 h-4 text-indigo-600 rounded border-slate-300 dark:border-slate-700 focus:ring-indigo-500"
           />
-          <span className="text-sm font-medium text-slate-800">
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
             Assign to all students ({students.length})
           </span>
         </label>
 
         {!assignToAll && (
-          <div className="mt-2 pl-2 space-y-1.5 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-            <p className="text-xs text-slate-500 mb-1.5 font-medium">
+          <div className="mt-2 pl-2 space-y-1.5 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 bg-slate-50 dark:bg-slate-800/50">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-medium">
               Select one or more students:
             </p>
             {students.map((student) => {
@@ -227,13 +226,13 @@ export default function AssignmentForm({
               return (
                 <label
                   key={student.id}
-                  className="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer hover:text-slate-900"
+                  className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer hover:text-slate-900 dark:hover:text-white"
                 >
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => handleStudentCheck(student.id)}
-                    className="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                    className="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 dark:border-slate-700 focus:ring-indigo-500"
                   />
                   <span>{student.name}</span>
                 </label>
@@ -242,22 +241,22 @@ export default function AssignmentForm({
           </div>
         )}
         {errors.assignedTo && (
-          <p className="text-xs text-red-600 mt-1">{errors.assignedTo}</p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.assignedTo}</p>
         )}
       </div>
 
       {/* Form Action Buttons */}
-      <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+      <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+          className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-sm"
+          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
         >
           {initialData ? 'Save Changes' : 'Create Assignment'}
         </button>
@@ -265,4 +264,3 @@ export default function AssignmentForm({
     </form>
   )
 }
-

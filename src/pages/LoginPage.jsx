@@ -14,11 +14,10 @@ function UserCard({ user, onSelect }) {
       className="flex items-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-left transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
     >
       <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mr-3 transition ${
-          isAdmin
+        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mr-3 transition ${isAdmin
             ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white'
             : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 group-hover:bg-emerald-600 group-hover:text-white'
-        }`}
+          }`}
       >
         {user.name.charAt(0)}
       </div>
@@ -70,7 +69,7 @@ export default function LoginPage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Professors / Admins ({admins.length})
+              Professors  ({admins.length})
             </h2>
             <span className="text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full font-medium">
               Create &amp; Review

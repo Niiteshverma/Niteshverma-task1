@@ -6,7 +6,7 @@ export default function App() {
           Assignment &amp; Review Dashboard
         </h1>
         <p className="text-slate-600 text-sm">
-          Phase 1 setup complete: Vite, React, and Tailwind CSS configured.
+          Phase 2 complete: Seed data and useLocalStorage ready.
         </p>
       </div>
     </main>

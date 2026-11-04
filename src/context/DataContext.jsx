@@ -1,13 +1,42 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { initialAssignments, initialSubmissions } from '../data/seedData'
 
 const DataContext = createContext(null)
 
 export function DataProvider({ children }) {
+  const [storageError, setStorageError] = useState(null)
+
+  const handleStorageError = useCallback((err) => {
+    setStorageError(
+      'Corrupted data detected in local storage. Click below to restore initial seed data.'
+    )
+  }, [])
+
   // Synchronize assignments and submissions with localStorage
-  const [assignments, setAssignments] = useLocalStorage('assignments', initialAssignments)
-  const [submissions, setSubmissions] = useLocalStorage('submissions', initialSubmissions)
+  const [assignments, setAssignments] = useLocalStorage(
+    'assignments',
+    initialAssignments,
+    handleStorageError
+  )
+  const [submissions, setSubmissions] = useLocalStorage(
+    'submissions',
+    initialSubmissions,
+    handleStorageError
+  )
+
+  // Reset corrupted data to initial seeds
+  const resetData = () => {
+    try {
+      localStorage.setItem('assignments', JSON.stringify(initialAssignments))
+      localStorage.setItem('submissions', JSON.stringify(initialSubmissions))
+    } catch (e) {
+      console.warn('Could not reset localStorage directly:', e)
+    }
+    setAssignments(initialAssignments)
+    setSubmissions(initialSubmissions)
+    setStorageError(null)
+  }
 
   // Find a specific student's submission for an assignment
   const getStudentSubmission = (assignmentId, studentId) => {
@@ -64,7 +93,6 @@ export function DataProvider({ children }) {
       )
     )
 
-    // If assigned students changed, prune any leftover submissions for unassigned students
     if (updatedData.assignedTo) {
       setSubmissions((prevSubmissions) =>
         prevSubmissions.filter(
@@ -92,6 +120,8 @@ export function DataProvider({ children }) {
         setAssignments,
         submissions,
         setSubmissions,
+        storageError,
+        resetData,
         getStudentSubmission,
         getStudentAssignments,
         getAdminAssignments,

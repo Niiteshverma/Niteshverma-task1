@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '../components/common/Header'
 import Modal from '../components/common/Modal'
+import Loader from '../components/common/Loader'
+import EmptyState from '../components/common/EmptyState'
+import ErrorState from '../components/common/ErrorState'
 import AdminAssignmentCard from '../components/admin/AdminAssignmentCard'
 import AssignmentForm from '../components/admin/AssignmentForm'
 import { useAuth } from '../context/AuthContext'
@@ -15,12 +18,24 @@ export default function AdminDashboard() {
     createAssignment,
     updateAssignment,
     deleteAssignment,
+    storageError,
+    resetData,
   } = useData()
+
+  // Simulated short loading delay (~500ms)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Modal states for Create, Edit, and Delete confirmation
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [assignmentToEdit, setAssignmentToEdit] = useState(null)
   const [assignmentToDelete, setAssignmentToDelete] = useState(null)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Students list from seed users for assignment targeting and status tracking
   const students = initialUsers.filter((u) => u.role === 'student')
@@ -57,65 +72,71 @@ export default function AdminDashboard() {
       <Header />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
-        {/* Admin Header Section */}
-        <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">
-              Welcome, {currentUser?.name}!
-            </h2>
-            <p className="text-sm text-slate-500 mt-1">
-              Admin Workspace &bull; Manage assignments, monitor progress, and review student submissions.
-            </p>
+        {/* Storage Error State */}
+        {storageError ? (
+          <ErrorState message={storageError} onReset={resetData} />
+        ) : isLoading ? (
+          /* Simulated Loading State */
+          <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
+            <Loader message="Loading your assignments..." />
           </div>
+        ) : (
+          <>
+            {/* Admin Header Section */}
+            <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-800">
+                  Welcome, {currentUser?.name}!
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                  Admin Workspace &bull; Manage assignments, monitor progress, and review student submissions.
+                </p>
+              </div>
 
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition shrink-0"
-          >
-            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Create Assignment
-          </button>
-        </section>
-
-        {/* Assignments List */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-slate-800">
-              Your Created Assignments ({adminAssignments.length})
-            </h3>
-          </div>
-
-          {adminAssignments.length === 0 ? (
-            <div className="bg-white rounded-xl border border-dashed border-slate-300 p-10 text-center space-y-3">
-              <p className="text-sm text-slate-500">
-                You haven&apos;t created any assignments yet.
-              </p>
               <button
                 type="button"
                 onClick={() => setIsCreateOpen(true)}
-                className="inline-flex items-center px-3.5 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 border border-indigo-200 rounded-lg transition"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition shrink-0"
               >
-                + Create your first assignment
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Create Assignment
               </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {adminAssignments.map((assignment) => (
-                <AdminAssignmentCard
-                  key={assignment.id}
-                  assignment={assignment}
-                  allStudents={students}
-                  getStudentSubmission={getStudentSubmission}
-                  onEdit={(item) => setAssignmentToEdit(item)}
-                  onDelete={(item) => setAssignmentToDelete(item)}
+            </section>
+
+            {/* Assignments Section */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm sm:text-base font-semibold text-slate-800">
+                  Your Created Assignments ({adminAssignments.length})
+                </h3>
+              </div>
+
+              {adminAssignments.length === 0 ? (
+                <EmptyState
+                  title="You haven't created any assignments"
+                  description="Get started by creating your first assignment for your students."
+                  actionLabel="+ Create Assignment"
+                  onAction={() => setIsCreateOpen(true)}
                 />
-              ))}
-            </div>
-          )}
-        </section>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {adminAssignments.map((assignment) => (
+                    <AdminAssignmentCard
+                      key={assignment.id}
+                      assignment={assignment}
+                      allStudents={students}
+                      getStudentSubmission={getStudentSubmission}
+                      onEdit={(item) => setAssignmentToEdit(item)}
+                      onDelete={(item) => setAssignmentToDelete(item)}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
+        )}
       </main>
 
       {/* Create Assignment Modal */}

@@ -67,6 +67,12 @@ npm run dev
 ```
 Open your browser and navigate to `http://localhost:5173/`.
 
+### Testing
+Run unit and integration tests with Vitest:
+```bash
+npm test
+```
+
 ### Production Build & Preview
 To create an optimized production build:
 ```bash
@@ -111,6 +117,12 @@ src/
 │   ├── AdminDashboard.jsx            # Admin control center
 │   ├── LoginPage.jsx                 # Mock user picker (Admins & Students)
 │   └── StudentDashboard.jsx          # Student assignment feed & submission workflow
+├── test/
+│   ├── app.test.jsx                  # Vitest unit and integration test suite
+│   └── setup.js                      # Test setup and localStorage polyfill
+├── utils/
+│   ├── constants.js                  # Shared status, roles, and storage constants
+│   └── helpers.js                    # Formatting, date calculations & URL validators
 ├── App.jsx                           # Application routing and provider tree
 ├── index.css                         # Tailwind CSS directives
 └── main.jsx                          # React application root

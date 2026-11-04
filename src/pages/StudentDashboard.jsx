@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '../components/common/Header'
 import Modal from '../components/common/Modal'
 import Loader from '../components/common/Loader'
@@ -7,6 +7,7 @@ import ErrorState from '../components/common/ErrorState'
 import AssignmentCard from '../components/student/AssignmentCard'
 import StudentProgress from '../components/student/StudentProgress'
 import { formatDate } from '../utils/helpers'
+import { LOADING_DELAY, STATUS } from '../utils/constants'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 
@@ -20,59 +21,49 @@ export default function StudentDashboard() {
     resetData,
   } = useData()
 
-  // Simulated short loading delay (~500ms)
+  // Component state
   const [isLoading, setIsLoading] = useState(true)
-
-  // Track submission confirmation modal state
   const [assignmentToSubmit, setAssignmentToSubmit] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // Bonus: Filter and sort states
-  const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'not-submitted' | 'submitted'
+  const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'pending' | 'submitted'
   const [sortOrder, setSortOrder] = useState('asc') // 'asc' (soonest) | 'desc' (latest)
 
+  // Short simulated loading delay
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 500)
+    const timer = setTimeout(() => setIsLoading(false), LOADING_DELAY)
     return () => clearTimeout(timer)
   }, [])
 
-  // Retrieve all assignments assigned to this student
-  const studentAssignments = useMemo(() => {
-    return currentUser ? getStudentAssignments(currentUser.id) : []
-  }, [currentUser, getStudentAssignments])
+  // Derived values calculated directly during render
+  const studentAssignments = currentUser ? getStudentAssignments(currentUser.id) : []
 
-  // Count how many assignments this student has submitted
-  const submittedCount = useMemo(() => {
-    return studentAssignments.filter(
-      (assignment) => getStudentSubmission(assignment.id, currentUser?.id)?.status === 'Submitted'
-    ).length
-  }, [studentAssignments, getStudentSubmission, currentUser])
+  const submittedCount = studentAssignments.filter(
+    (a) => getStudentSubmission(a.id, currentUser?.id)?.status === STATUS.SUBMITTED
+  ).length
 
-  // Apply filtering and sorting to visible assignments
-  const visibleAssignments = useMemo(() => {
-    return studentAssignments
-      .filter((assignment) => {
-        const isSubmitted = getStudentSubmission(assignment.id, currentUser?.id)?.status === 'Submitted'
-        if (statusFilter === 'submitted') return isSubmitted
-        if (statusFilter === 'not-submitted') return !isSubmitted
-        return true
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.dueDate).getTime() || 0
-        const dateB = new Date(b.dueDate).getTime() || 0
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
-      })
-  }, [studentAssignments, statusFilter, sortOrder, getStudentSubmission, currentUser])
+  const pendingCount = studentAssignments.length - submittedCount
 
+  // Filter and sort visible assignments
+  const visibleAssignments = studentAssignments
+    .filter((a) => {
+      const isSubmitted = getStudentSubmission(a.id, currentUser?.id)?.status === STATUS.SUBMITTED
+      if (statusFilter === 'submitted') return isSubmitted
+      if (statusFilter === 'pending') return !isSubmitted
+      return true
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.dueDate).getTime() || 0
+      const dateB = new Date(b.dueDate).getTime() || 0
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+    })
+
+  // Handlers
   const handleOpenSubmitModal = (assignment) => {
     setAssignmentToSubmit(assignment)
   }
 
   const handleCloseSubmitModal = () => {
-    if (isSubmitting) return
-    setAssignmentToSubmit(null)
+    if (!isSubmitting) setAssignmentToSubmit(null)
   }
 
   const handleConfirmSubmit = () => {
@@ -89,29 +80,25 @@ export default function StudentDashboard() {
       <Header />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
-        {/* Error State */}
         {storageError ? (
           <ErrorState message={storageError} onReset={resetData} />
         ) : isLoading ? (
-          /* Simulated Loading State */
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
             <Loader message="Loading your assignments..." />
           </div>
         ) : (
           <>
-            {/* Welcome Section */}
-            <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">
-                  Welcome back, {currentUser?.name}!
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  Review your course materials and confirm your assignment submissions.
-                </p>
-              </div>
+            {/* Student Welcome Banner */}
+            <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">
+                Welcome back, {currentUser?.name}!
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Review your course materials and confirm your assignment submissions.
+              </p>
             </section>
 
-            {/* Progress Overview (shown if student has assignments) */}
+            {/* Overall Progress */}
             {studentAssignments.length > 0 && (
               <StudentProgress
                 submittedCount={submittedCount}
@@ -143,14 +130,14 @@ export default function StudentDashboard() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setStatusFilter('not-submitted')}
+                        onClick={() => setStatusFilter('pending')}
                         className={`px-2.5 py-1 rounded-md font-medium transition ${
-                          statusFilter === 'not-submitted'
+                          statusFilter === 'pending'
                             ? 'bg-indigo-600 text-white'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        Pending ({studentAssignments.length - submittedCount})
+                        Pending ({pendingCount})
                       </button>
                       <button
                         type="button"
@@ -187,7 +174,7 @@ export default function StudentDashboard() {
               ) : visibleAssignments.length === 0 ? (
                 <EmptyState
                   title="No matching assignments"
-                  description="No assignments found for the selected filter."
+                  description="No assignments match the selected filter."
                   actionLabel="Show all assignments"
                   onAction={() => setStatusFilter('all')}
                 />

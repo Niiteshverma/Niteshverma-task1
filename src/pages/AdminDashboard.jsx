@@ -6,6 +6,7 @@ import EmptyState from '../components/common/EmptyState'
 import ErrorState from '../components/common/ErrorState'
 import AdminAssignmentCard from '../components/admin/AdminAssignmentCard'
 import AssignmentForm from '../components/admin/AssignmentForm'
+import { LOADING_DELAY, ROLES } from '../utils/constants'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 import { initialUsers } from '../data/seedData'
@@ -22,45 +23,35 @@ export default function AdminDashboard() {
     resetData,
   } = useData()
 
-  // Simulated short loading delay (~500ms)
+  // Component state
   const [isLoading, setIsLoading] = useState(true)
-
-  // Modal states for Create, Edit, and Delete confirmation
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [assignmentToEdit, setAssignmentToEdit] = useState(null)
   const [assignmentToDelete, setAssignmentToDelete] = useState(null)
 
+  // Short simulated loading delay
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 500)
+    const timer = setTimeout(() => setIsLoading(false), LOADING_DELAY)
     return () => clearTimeout(timer)
   }, [])
 
-  // Students list from seed users for assignment targeting and status tracking
-  const students = initialUsers.filter((u) => u.role === 'student')
-
-  // Retrieve only assignments created by this logged-in admin
+  // Derived values
+  const students = initialUsers.filter((u) => u.role === ROLES.STUDENT)
   const adminAssignments = currentUser ? getAdminAssignments(currentUser.id) : []
 
-  // Create submission handler
+  // Handlers
   const handleCreateSubmit = (formData) => {
     if (!currentUser) return
-    createAssignment({
-      ...formData,
-      createdBy: currentUser.id,
-    })
+    createAssignment({ ...formData, createdBy: currentUser.id })
     setIsCreateOpen(false)
   }
 
-  // Edit submission handler
   const handleEditSubmit = (formData) => {
     if (!assignmentToEdit || !currentUser) return
     updateAssignment(assignmentToEdit.id, formData, currentUser.id)
     setAssignmentToEdit(null)
   }
 
-  // Confirm delete handler
   const handleConfirmDelete = () => {
     if (!assignmentToDelete || !currentUser) return
     deleteAssignment(assignmentToDelete.id, currentUser.id)
@@ -72,24 +63,22 @@ export default function AdminDashboard() {
       <Header />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
-        {/* Storage Error State */}
         {storageError ? (
           <ErrorState message={storageError} onReset={resetData} />
         ) : isLoading ? (
-          /* Simulated Loading State */
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
             <Loader message="Loading your assignments..." />
           </div>
         ) : (
           <>
-            {/* Admin Header Section */}
+            {/* Admin Header Banner */}
             <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">
                   Welcome, {currentUser?.name}!
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  Admin Workspace &bull; Manage assignments, monitor progress, and review student submissions.
+                  Admin Workspace • Manage assignments, monitor progress, and review student submissions.
                 </p>
               </div>
 
@@ -105,7 +94,7 @@ export default function AdminDashboard() {
               </button>
             </section>
 
-            {/* Assignments Section */}
+            {/* Assignments Grid */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100">
@@ -139,7 +128,7 @@ export default function AdminDashboard() {
         )}
       </main>
 
-      {/* Create Assignment Modal */}
+      {/* Create Modal */}
       <Modal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
@@ -153,7 +142,7 @@ export default function AdminDashboard() {
         />
       </Modal>
 
-      {/* Edit Assignment Modal */}
+      {/* Edit Modal */}
       <Modal
         isOpen={Boolean(assignmentToEdit)}
         onClose={() => setAssignmentToEdit(null)}
@@ -182,12 +171,12 @@ export default function AdminDashboard() {
           </p>
 
           {assignmentToDelete && (
-            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-850 rounded-lg p-3 text-sm">
+            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-lg p-3 text-sm">
               <p className="font-semibold text-red-900 dark:text-red-200">
                 {assignmentToDelete.title}
               </p>
               <p className="text-xs text-red-700 dark:text-red-400 mt-1">
-                This will permanently delete the assignment and all associated student submission records.
+                This will permanently delete the assignment and all student submissions for it.
               </p>
             </div>
           )}

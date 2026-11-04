@@ -2,29 +2,22 @@ import { useEffect, useRef } from 'react'
 
 export default function Modal({ isOpen, onClose, title, children }) {
   const modalRef = useRef(null)
-  const previousActiveElementRef = useRef(null)
+  const previousActiveElement = useRef(null)
 
   useEffect(() => {
     if (!isOpen) return
 
-    // Save previously focused element to restore when modal closes
-    previousActiveElementRef.current = document.activeElement
+    // Remember which element had focus before opening modal
+    previousActiveElement.current = document.activeElement
 
-    // Focus the first focusable element inside the modal
-    const focusFirstElement = () => {
-      if (!modalRef.current) return
-      const focusables = modalRef.current.querySelectorAll(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    // Move initial focus into modal
+    const timer = setTimeout(() => {
+      const firstInput = modalRef.current?.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       )
-      if (focusables.length > 0) {
-        focusables[0].focus()
-      }
-    }
+      firstInput?.focus()
+    }, 50)
 
-    // Small delay to ensure modal DOM is mounted
-    const focusTimer = setTimeout(focusFirstElement, 50)
-
-    // Handle Escape and Trap Focus (Tab / Shift+Tab)
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         event.preventDefault()
@@ -32,33 +25,24 @@ export default function Modal({ isOpen, onClose, title, children }) {
         return
       }
 
+      // Trap Tab key inside the modal
       if (event.key === 'Tab' && modalRef.current) {
         const focusables = Array.from(
           modalRef.current.querySelectorAll(
             'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
           )
         )
+        if (focusables.length === 0) return
 
-        if (focusables.length === 0) {
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+
+        if (event.shiftKey && document.activeElement === first) {
           event.preventDefault()
-          return
-        }
-
-        const firstElement = focusables[0]
-        const lastElement = focusables[focusables.length - 1]
-
-        if (event.shiftKey) {
-          // Shift + Tab: if on first element, wrap to last
-          if (document.activeElement === firstElement) {
-            event.preventDefault()
-            lastElement.focus()
-          }
-        } else {
-          // Tab: if on last element, wrap to first
-          if (document.activeElement === lastElement) {
-            event.preventDefault()
-            firstElement.focus()
-          }
+          last.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
         }
       }
     }
@@ -66,11 +50,11 @@ export default function Modal({ isOpen, onClose, title, children }) {
     window.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      clearTimeout(focusTimer)
+      clearTimeout(timer)
       window.removeEventListener('keydown', handleKeyDown)
-      // Restore focus to original trigger element upon close
-      if (previousActiveElementRef.current && typeof previousActiveElementRef.current.focus === 'function') {
-        previousActiveElementRef.current.focus()
+      // Return focus to the trigger button when modal closes
+      if (previousActiveElement.current?.focus) {
+        previousActiveElement.current.focus()
       }
     }
   }, [isOpen, onClose])
@@ -84,13 +68,13 @@ export default function Modal({ isOpen, onClose, title, children }) {
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      {/* Click outside backdrop to close */}
+      {/* Click backdrop to close */}
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
-      {/* Modal Dialog Content */}
+      {/* Modal Card */}
       <div
         ref={modalRef}
-        className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-md w-full max-h-[90vh] overflow-y-auto p-6 z-10 space-y-4 animate-in fade-in zoom-in-95 duration-150"
+        className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-md w-full max-h-[90vh] overflow-y-auto p-6 z-10 space-y-4"
       >
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
           <h3 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">

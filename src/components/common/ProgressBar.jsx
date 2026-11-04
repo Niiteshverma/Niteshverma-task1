@@ -1,6 +1,7 @@
+import { getPercentage } from '../../utils/helpers'
+
 export default function ProgressBar({ value = 0, max = 0, className = '' }) {
-  // Prevent division by zero and clamp percentage between 0 and 100
-  const percentage = max > 0 ? Math.min(100, Math.max(0, Math.round((value / max) * 100))) : 0
+  const percentage = getPercentage(value, max)
 
   return (
     <div className={`w-full ${className}`}>

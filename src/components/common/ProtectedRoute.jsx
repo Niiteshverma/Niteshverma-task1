@@ -1,22 +1,18 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { ROLES } from '../../utils/constants'
 
-/**
- * Route wrapper that ensures:
- * 1. Unauthenticated or invalid users are redirected to the login page.
- * 2. Students cannot access admin routes and admins cannot access student routes.
- */
 export default function ProtectedRoute({ allowedRole, children }) {
   const { currentUser } = useAuth()
 
-  // Not logged in or invalid session -> redirect to login
+  // If not logged in, redirect to login page
   if (!currentUser || !currentUser.role) {
     return <Navigate to="/" replace />
   }
 
-  // Logged in with wrong role -> redirect to their designated dashboard
+  // If logged in with wrong role, redirect to their role's dashboard
   if (currentUser.role !== allowedRole) {
-    const destination = currentUser.role === 'admin' ? '/admin' : '/student'
+    const destination = currentUser.role === ROLES.ADMIN ? '/admin' : '/student'
     return <Navigate to={destination} replace />
   }
 

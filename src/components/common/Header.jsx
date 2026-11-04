@@ -7,16 +7,17 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
+  if (!currentUser) return null
+
   const handleLogout = () => {
     logout()
     navigate('/', { replace: true })
   }
 
-  if (!currentUser) return null
-
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Brand Logo & Workspace Info */}
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
             AR
@@ -31,8 +32,8 @@ export default function Header() {
           </div>
         </div>
 
+        {/* Right Actions: Dark Mode Toggle, User Name, Logout */}
         <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Dark Mode Toggle */}
           <button
             type="button"
             onClick={toggleTheme}
@@ -40,7 +41,6 @@ export default function Header() {
             className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
           >
             {theme === 'dark' ? (
-              /* Sun Icon */
               <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -50,7 +50,6 @@ export default function Header() {
                 />
               </svg>
             ) : (
-              /* Moon Icon */
               <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -62,7 +61,6 @@ export default function Header() {
             )}
           </button>
 
-          {/* User Info */}
           <div className="text-right hidden sm:block">
             <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
               {currentUser.name}
@@ -72,7 +70,6 @@ export default function Header() {
             </span>
           </div>
 
-          {/* Logout Button */}
           <button
             type="button"
             onClick={handleLogout}

@@ -1,12 +1,12 @@
 // Initial seed users: 2 Admins and 5 Students
 export const initialUsers = [
-  { id: 'admin-1', name: 'Dr. Sarah Jenkins', role: 'admin' },
-  { id: 'admin-2', name: 'Prof. Alan Turing', role: 'admin' },
-  { id: 'student-1', name: 'Alex Johnson', role: 'student' },
-  { id: 'student-2', name: 'Beatriz Morales', role: 'student' },
-  { id: 'student-3', name: 'Charlie Chen', role: 'student' },
+  { id: 'admin-1', name: 'Dr.Nitesh Verma', role: 'admin' },
+  { id: 'admin-2', name: 'Prof. Priyanshu', role: 'admin' },
+  { id: 'student-1', name: 'manish', role: 'student' },
+  { id: 'student-2', name: 'shubham', role: 'student' },
+  { id: 'student-3', name: 'ashish', role: 'student' },
   { id: 'student-4', name: 'Divya Patel', role: 'student' },
-  { id: 'student-5', name: 'Ethan Wright', role: 'student' },
+  { id: 'student-5', name: 'Ayush', role: 'student' },
 ]
 
 // 8 assignments with a mix of past and future dates, assigned to all or selected students

@@ -8,9 +8,10 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [storedUser, setStoredUser] = useLocalStorage(STORAGE_KEYS.USER, null)
 
-  // Validate that the stored user has a recognized role and id
-  const hasValidRole = storedUser && (storedUser.role === ROLES.STUDENT || storedUser.role === ROLES.ADMIN)
-  const currentUser = hasValidRole && storedUser.id ? storedUser : null
+  // Validate that the stored user has a recognized role and non-empty id
+  const isValidObject = storedUser && typeof storedUser === 'object' && !Array.isArray(storedUser)
+  const hasValidRole = isValidObject && (storedUser.role === ROLES.STUDENT || storedUser.role === ROLES.ADMIN)
+  const currentUser = hasValidRole && typeof storedUser.id === 'string' && storedUser.id.trim() ? storedUser : null
 
   const login = (user) => {
     if (user && user.id && (user.role === ROLES.STUDENT || user.role === ROLES.ADMIN)) {

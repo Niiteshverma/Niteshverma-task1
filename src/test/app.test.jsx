@@ -69,12 +69,12 @@ describe('Assignment & Review Dashboard Test Suite', () => {
       </ThemeProvider>
     )
 
-    // Click Alex Johnson (Student)
-    const alexBtn = screen.getByText('Alex Johnson')
-    fireEvent.click(alexBtn)
+    // Click manish (Student)
+    const studentBtn = screen.getByText('manish')
+    fireEvent.click(studentBtn)
 
     // Expect Student Dashboard welcome message
-    expect(await screen.findByText(/Welcome back, Alex Johnson!/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Welcome back, manish!/i)).toBeInTheDocument()
   })
 
   // 5. Protected Route: Redirects unauthorized user

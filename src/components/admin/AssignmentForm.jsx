@@ -25,7 +25,7 @@ export default function AssignmentForm({
       setDescription(initialData.description || '')
       setDueDate(initialData.dueDate || '')
       setDriveLink(initialData.driveLink || '')
-      const isAll = initialData.assignedTo?.length === students.length
+      const isAll = students.length > 0 && initialData.assignedTo?.length === students.length
       setAssignToAll(isAll)
       setSelectedStudentIds(initialData.assignedTo || [])
     } else {
@@ -56,7 +56,7 @@ export default function AssignmentForm({
         ? prev.filter((id) => id !== studentId)
         : [...prev, studentId]
 
-      setAssignToAll(next.length === students.length)
+      setAssignToAll(students.length > 0 && next.length === students.length)
       if (next.length > 0 && errors.assignedTo) {
         setErrors((errs) => ({ ...errs, assignedTo: '' }))
       }

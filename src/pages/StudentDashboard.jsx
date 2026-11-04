@@ -137,7 +137,7 @@ export default function StudentDashboard() {
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        Pending ({pendingCount})
+                        Not submitted ({pendingCount})
                       </button>
                       <button
                         type="button"

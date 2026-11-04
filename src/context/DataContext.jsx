@@ -23,10 +23,14 @@ export function DataProvider({ children }) {
     )
   }
 
+  // Get all assignments created by a specific admin
+  const getAdminAssignments = (adminId) => {
+    return assignments.filter((assignment) => assignment.createdBy === adminId)
+  }
+
   // Submit an assignment for a student (prevents duplicates)
   const submitAssignment = (assignmentId, studentId) => {
     setSubmissions((prevSubmissions) => {
-      // Check if already submitted to prevent duplicates
       const exists = prevSubmissions.some(
         (sub) => sub.assignmentId === assignmentId && sub.studentId === studentId
       )
@@ -42,6 +46,16 @@ export function DataProvider({ children }) {
     })
   }
 
+  // Create a new assignment with a generated UUID
+  const createAssignment = (assignmentData) => {
+    const newAssignment = {
+      ...assignmentData,
+      id: crypto.randomUUID(),
+    }
+    setAssignments((prevAssignments) => [...prevAssignments, newAssignment])
+    return newAssignment
+  }
+
   return (
     <DataContext.Provider
       value={{
@@ -51,7 +65,9 @@ export function DataProvider({ children }) {
         setSubmissions,
         getStudentSubmission,
         getStudentAssignments,
+        getAdminAssignments,
         submitAssignment,
+        createAssignment,
       }}
     >
       {children}

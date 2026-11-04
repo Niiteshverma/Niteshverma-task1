@@ -10,12 +10,12 @@ export default function AdminAssignmentCard({
 }) {
   const assignedCount = assignment.assignedTo ? assignment.assignedTo.length : 0
   const isAllStudents = assignedCount === allStudents.length
-  const hasValidDriveLink = isValidUrl(assignment.driveLink)
+  const hasValidLink = isValidUrl(assignment.driveLink)
 
   return (
     <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between space-y-4 overflow-hidden break-words">
       <div className="space-y-3">
-        {/* Title & Scope Badge */}
+        {/* Title & Enrolled Count Badge */}
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-snug break-words">
             {assignment.title}
@@ -37,7 +37,7 @@ export default function AdminAssignmentCard({
             {formatDate(assignment.dueDate)}
           </div>
 
-          {hasValidDriveLink && (
+          {hasValidLink && (
             <a
               href={assignment.driveLink}
               target="_blank"
@@ -53,7 +53,7 @@ export default function AdminAssignmentCard({
         </div>
       </div>
 
-      {/* Student Submissions Tracking Section */}
+      {/* Student Submissions Tracking */}
       <StudentStatusList
         assignedStudentIds={assignment.assignedTo || []}
         assignmentId={assignment.id}
@@ -61,7 +61,7 @@ export default function AdminAssignmentCard({
         getStudentSubmission={getStudentSubmission}
       />
 
-      {/* Card Actions: Edit & Delete */}
+      {/* Actions: Edit & Delete Buttons */}
       <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
         <button
           type="button"

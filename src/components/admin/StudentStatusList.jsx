@@ -1,4 +1,6 @@
 import ProgressBar from '../common/ProgressBar'
+import { getPercentage } from '../../utils/helpers'
+import { STATUS } from '../../utils/constants'
 
 export default function StudentStatusList({
   assignedStudentIds = [],
@@ -8,7 +10,7 @@ export default function StudentStatusList({
 }) {
   const totalAssigned = assignedStudentIds.length
 
-  // Filter students who are assigned to this assignment
+  // Students enrolled in this assignment
   const assignedStudents = allStudents.filter((student) =>
     assignedStudentIds.includes(student.id)
   )
@@ -16,17 +18,14 @@ export default function StudentStatusList({
   // Count how many assigned students have submitted
   const submittedCount = assignedStudents.filter((student) => {
     const submission = getStudentSubmission(assignmentId, student.id)
-    return submission?.status === 'Submitted'
+    return submission?.status === STATUS.SUBMITTED
   }).length
 
-  // Calculate percentage safely avoiding division by zero
-  const completionPercentage = totalAssigned > 0
-    ? Math.round((submittedCount / totalAssigned) * 100)
-    : 0
+  const completionPercentage = getPercentage(submittedCount, totalAssigned)
 
   return (
     <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-      {/* Class Completion Progress */}
+      {/* Progress summary */}
       <div>
         <div className="flex items-center justify-between text-xs mb-1.5">
           <span className="font-semibold text-slate-700 dark:text-slate-300">Class Completion</span>
@@ -37,14 +36,14 @@ export default function StudentStatusList({
         <ProgressBar value={submittedCount} max={totalAssigned} />
       </div>
 
-      {/* Student List & Status Badges */}
+      {/* Student list */}
       <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
         {assignedStudents.length === 0 ? (
           <p className="text-xs text-slate-400 italic">No students assigned.</p>
         ) : (
           assignedStudents.map((student) => {
             const submission = getStudentSubmission(assignmentId, student.id)
-            const isSubmitted = submission?.status === 'Submitted'
+            const isSubmitted = submission?.status === STATUS.SUBMITTED
 
             return (
               <div
@@ -61,7 +60,10 @@ export default function StudentStatusList({
                       : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50'
                   }`}
                 >
-                  {isSubmitted ? 'Submitted' : 'Not submitted'}
+                  <span className="mr-1" aria-hidden="true">
+                    {isSubmitted ? '✓' : '○'}
+                  </span>
+                  {isSubmitted ? STATUS.SUBMITTED : STATUS.NOT_SUBMITTED}
                 </span>
               </div>
             )

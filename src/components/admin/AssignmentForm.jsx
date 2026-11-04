@@ -16,32 +16,29 @@ export default function AssignmentForm({
   const [selectedStudentIds, setSelectedStudentIds] = useState([])
   const [errors, setErrors] = useState({})
 
-  // Initialize or reset form values when opening or initialData changes
+  // Initialize or reset form fields
   useEffect(() => {
-    if (isOpen) {
-      if (initialData) {
-        setTitle(initialData.title || '')
-        setDescription(initialData.description || '')
-        setDueDate(initialData.dueDate || '')
-        setDriveLink(initialData.driveLink || '')
-        const isAll =
-          initialData.assignedTo?.length === students.length &&
-          students.every((s) => initialData.assignedTo.includes(s.id))
-        setAssignToAll(isAll)
-        setSelectedStudentIds(initialData.assignedTo || [])
-      } else {
-        setTitle('')
-        setDescription('')
-        setDueDate('')
-        setDriveLink('')
-        setAssignToAll(true)
-        setSelectedStudentIds(students.map((s) => s.id))
-      }
-      setErrors({})
+    if (!isOpen) return
+
+    if (initialData) {
+      setTitle(initialData.title || '')
+      setDescription(initialData.description || '')
+      setDueDate(initialData.dueDate || '')
+      setDriveLink(initialData.driveLink || '')
+      const isAll = initialData.assignedTo?.length === students.length
+      setAssignToAll(isAll)
+      setSelectedStudentIds(initialData.assignedTo || [])
+    } else {
+      setTitle('')
+      setDescription('')
+      setDueDate('')
+      setDriveLink('')
+      setAssignToAll(true)
+      setSelectedStudentIds(students.map((s) => s.id))
     }
+    setErrors({})
   }, [isOpen, initialData, students])
 
-  // Toggle "Assign to all"
   const handleToggleAll = (e) => {
     const checked = e.target.checked
     setAssignToAll(checked)
@@ -53,35 +50,27 @@ export default function AssignmentForm({
     }
   }
 
-  // Toggle individual student checkbox
-  const handleStudentCheck = (studentId) => {
+  const handleToggleStudent = (studentId) => {
     setSelectedStudentIds((prev) => {
-      const updated = prev.includes(studentId)
+      const next = prev.includes(studentId)
         ? prev.filter((id) => id !== studentId)
         : [...prev, studentId]
 
-      setAssignToAll(updated.length === students.length)
-
-      if (updated.length > 0 && errors.assignedTo) {
+      setAssignToAll(next.length === students.length)
+      if (next.length > 0 && errors.assignedTo) {
         setErrors((errs) => ({ ...errs, assignedTo: '' }))
       }
-      return updated
+      return next
     })
   }
 
-  // Validate form fields
   const validate = () => {
     const newErrors = {}
 
-    if (!title || !title.trim()) {
-      newErrors.title = 'Title is required'
-    }
+    if (!title.trim()) newErrors.title = 'Title is required'
+    if (!dueDate) newErrors.dueDate = 'Due date is required'
 
-    if (!dueDate) {
-      newErrors.dueDate = 'Due date is required'
-    }
-
-    if (!driveLink || !driveLink.trim()) {
+    if (!driveLink.trim()) {
       newErrors.driveLink = 'Drive link is required'
     } else if (!isValidUrl(driveLink)) {
       newErrors.driveLink = 'Please enter a valid web URL starting with http:// or https://'
@@ -110,11 +99,11 @@ export default function AssignmentForm({
     })
   }
 
-  const isPastDueDate = Boolean(dueDate && dueDate < getTodayDate())
+  const isPastDate = Boolean(dueDate && dueDate < getTodayDate())
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-left" noValidate>
-      {/* Title Field */}
+      {/* Title */}
       <div>
         <label htmlFor="assignment-title" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
           Assignment Title <span className="text-red-500">*</span>
@@ -141,7 +130,7 @@ export default function AssignmentForm({
         )}
       </div>
 
-      {/* Description Field */}
+      {/* Description */}
       <div>
         <label htmlFor="assignment-desc" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
           Description
@@ -156,7 +145,7 @@ export default function AssignmentForm({
         />
       </div>
 
-      {/* Due Date & Drive Link Grid */}
+      {/* Due Date & Drive Link */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label htmlFor="assignment-due" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -171,7 +160,7 @@ export default function AssignmentForm({
               if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }))
             }}
             aria-invalid={Boolean(errors.dueDate)}
-            aria-describedby={errors.dueDate ? 'due-error' : isPastDueDate ? 'due-past-note' : undefined}
+            aria-describedby={errors.dueDate ? 'due-error' : isPastDate ? 'due-past-note' : undefined}
             className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
               errors.dueDate ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
             } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
@@ -181,7 +170,7 @@ export default function AssignmentForm({
               {errors.dueDate}
             </p>
           )}
-          {!errors.dueDate && isPastDueDate && (
+          {!errors.dueDate && isPastDate && (
             <p id="due-past-note" className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
               Note: This date is in the past. It will appear as overdue for students.
             </p>
@@ -215,7 +204,7 @@ export default function AssignmentForm({
         </div>
       </div>
 
-      {/* Student Assignment Selection */}
+      {/* Target Students */}
       <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
         <label className="flex items-center space-x-2 cursor-pointer mb-2">
           <input
@@ -234,23 +223,20 @@ export default function AssignmentForm({
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-medium">
               Select one or more students:
             </p>
-            {students.map((student) => {
-              const checked = selectedStudentIds.includes(student.id)
-              return (
-                <label
-                  key={student.id}
-                  className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer hover:text-slate-900 dark:hover:text-white"
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => handleStudentCheck(student.id)}
-                    className="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 dark:border-slate-700 focus:ring-indigo-500"
-                  />
-                  <span>{student.name}</span>
-                </label>
-              )
-            })}
+            {students.map((student) => (
+              <label
+                key={student.id}
+                className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer hover:text-slate-900 dark:hover:text-white"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedStudentIds.includes(student.id)}
+                  onChange={() => handleToggleStudent(student.id)}
+                  className="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 dark:border-slate-700 focus:ring-indigo-500"
+                />
+                <span>{student.name}</span>
+              </label>
+            ))}
           </div>
         )}
         {errors.assignedTo && (
@@ -260,7 +246,7 @@ export default function AssignmentForm({
         )}
       </div>
 
-      {/* Form Action Buttons */}
+      {/* Actions */}
       <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
         <button
           type="button"

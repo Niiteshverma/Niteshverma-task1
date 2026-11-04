@@ -23,6 +23,25 @@ export function DataProvider({ children }) {
     )
   }
 
+  // Submit an assignment for a student (prevents duplicates)
+  const submitAssignment = (assignmentId, studentId) => {
+    setSubmissions((prevSubmissions) => {
+      // Check if already submitted to prevent duplicates
+      const exists = prevSubmissions.some(
+        (sub) => sub.assignmentId === assignmentId && sub.studentId === studentId
+      )
+      if (exists) return prevSubmissions
+
+      const newSubmission = {
+        assignmentId,
+        studentId,
+        status: 'Submitted',
+        submittedAt: new Date().toISOString(),
+      }
+      return [...prevSubmissions, newSubmission]
+    })
+  }
+
   return (
     <DataContext.Provider
       value={{
@@ -32,6 +51,7 @@ export function DataProvider({ children }) {
         setSubmissions,
         getStudentSubmission,
         getStudentAssignments,
+        submitAssignment,
       }}
     >
       {children}

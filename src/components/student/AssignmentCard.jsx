@@ -1,10 +1,9 @@
-export default function AssignmentCard({ assignment, submission }) {
+export default function AssignmentCard({ assignment, submission, onSubmitClick }) {
   const isSubmitted = submission?.status === 'Submitted'
 
   // Format date nicely (e.g. "Oct 15, 2026")
   const formatDueDate = (dateString) => {
     if (!dateString) return 'No due date'
-    // Split YYYY-MM-DD to avoid timezone shifting
     const parts = dateString.split('-')
     if (parts.length === 3) {
       const year = parseInt(parts[0], 10)
@@ -42,34 +41,51 @@ export default function AssignmentCard({ assignment, submission }) {
         </p>
       </div>
 
-      <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="text-slate-500">
-          <span className="font-medium text-slate-700">Due: </span>
-          {formatDueDate(assignment.dueDate)}
+      <div className="space-y-3 pt-3 border-t border-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="text-slate-500">
+            <span className="font-medium text-slate-700">Due: </span>
+            {formatDueDate(assignment.dueDate)}
+          </div>
+
+          {assignment.driveLink && (
+            <a
+              href={assignment.driveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center font-medium text-indigo-600 hover:text-indigo-800 hover:underline"
+            >
+              Open Materials
+              <svg
+                className="w-3.5 h-3.5 ml-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
+          )}
         </div>
 
-        {assignment.driveLink && (
-          <a
-            href={assignment.driveLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center font-medium text-indigo-600 hover:text-indigo-800 hover:underline"
+        {/* Action Button: only visible if not submitted */}
+        {!isSubmitted ? (
+          <button
+            type="button"
+            onClick={() => onSubmitClick(assignment)}
+            className="w-full mt-2 py-2 px-3 text-xs sm:text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition"
           >
-            Open Materials
-            <svg
-              className="w-3.5 h-3.5 ml-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
-          </a>
+            Yes, I have submitted
+          </button>
+        ) : (
+          <div className="text-xs text-emerald-600 font-medium text-center py-1 bg-emerald-50/50 rounded">
+            &#10003; Marked as submitted
+          </div>
         )}
       </div>
     </article>

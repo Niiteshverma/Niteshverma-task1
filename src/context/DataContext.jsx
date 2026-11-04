@@ -7,7 +7,7 @@ const DataContext = createContext(null)
 export function DataProvider({ children }) {
   const [storageError, setStorageError] = useState(null)
 
-  const handleStorageError = useCallback((err) => {
+  const handleStorageError = useCallback(() => {
     setStorageError(
       'Corrupted data detected in local storage. Click below to restore initial seed data.'
     )
@@ -86,11 +86,15 @@ export function DataProvider({ children }) {
   }
 
   // Update an existing assignment and clean up unassigned student submissions
-  const updateAssignment = (assignmentId, updatedData) => {
+  const updateAssignment = (assignmentId, updatedData, adminId) => {
     setAssignments((prevAssignments) =>
-      prevAssignments.map((assignment) =>
-        assignment.id === assignmentId ? { ...assignment, ...updatedData } : assignment
-      )
+      prevAssignments.map((assignment) => {
+        if (assignment.id !== assignmentId) return assignment
+        if (adminId && assignment.createdBy !== adminId) {
+          return assignment
+        }
+        return { ...assignment, ...updatedData }
+      })
     )
 
     if (updatedData.assignedTo) {
@@ -104,9 +108,13 @@ export function DataProvider({ children }) {
   }
 
   // Delete an assignment and cascade remove its associated submissions
-  const deleteAssignment = (assignmentId) => {
+  const deleteAssignment = (assignmentId, adminId) => {
     setAssignments((prevAssignments) =>
-      prevAssignments.filter((assignment) => assignment.id !== assignmentId)
+      prevAssignments.filter((assignment) => {
+        if (assignment.id !== assignmentId) return true
+        if (adminId && assignment.createdBy !== adminId) return true
+        return false
+      })
     )
     setSubmissions((prevSubmissions) =>
       prevSubmissions.filter((sub) => sub.assignmentId !== assignmentId)

@@ -55,15 +55,15 @@ export default function AdminDashboard() {
 
   // Edit submission handler
   const handleEditSubmit = (formData) => {
-    if (!assignmentToEdit) return
-    updateAssignment(assignmentToEdit.id, formData)
+    if (!assignmentToEdit || !currentUser) return
+    updateAssignment(assignmentToEdit.id, formData, currentUser.id)
     setAssignmentToEdit(null)
   }
 
   // Confirm delete handler
   const handleConfirmDelete = () => {
-    if (!assignmentToDelete) return
-    deleteAssignment(assignmentToDelete.id)
+    if (!assignmentToDelete || !currentUser) return
+    deleteAssignment(assignmentToDelete.id, currentUser.id)
     setAssignmentToDelete(null)
   }
 

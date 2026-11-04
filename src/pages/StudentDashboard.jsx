@@ -6,6 +6,7 @@ import EmptyState from '../components/common/EmptyState'
 import ErrorState from '../components/common/ErrorState'
 import AssignmentCard from '../components/student/AssignmentCard'
 import StudentProgress from '../components/student/StudentProgress'
+import { formatDueDate } from '../utils/dateUtils'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 
@@ -224,7 +225,7 @@ export default function StudentDashboard() {
                 {assignmentToSubmit.title}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Due: {assignmentToSubmit.dueDate}
+                Due: {formatDueDate(assignmentToSubmit.dueDate)}
               </p>
             </div>
           )}

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { isValidHttpUrl } from '../../utils/urlUtils'
+import { getTodayDateString } from '../../utils/dateUtils'
 
 export default function AssignmentForm({
   isOpen,
@@ -58,7 +60,7 @@ export default function AssignmentForm({
       const updated = prev.includes(studentId)
         ? prev.filter((id) => id !== studentId)
         : [...prev, studentId]
-      
+
       setAssignToAll(updated.length === students.length)
 
       if (updated.length > 0 && errors.assignedTo) {
@@ -72,7 +74,7 @@ export default function AssignmentForm({
   const validate = () => {
     const newErrors = {}
 
-    if (!title.trim()) {
+    if (!title || !title.trim()) {
       newErrors.title = 'Title is required'
     }
 
@@ -80,17 +82,10 @@ export default function AssignmentForm({
       newErrors.dueDate = 'Due date is required'
     }
 
-    if (!driveLink.trim()) {
+    if (!driveLink || !driveLink.trim()) {
       newErrors.driveLink = 'Drive link is required'
-    } else {
-      try {
-        const url = new URL(driveLink.trim())
-        if (!['http:', 'https:'].includes(url.protocol)) {
-          newErrors.driveLink = 'Link must start with http:// or https://'
-        }
-      } catch {
-        newErrors.driveLink = 'Please enter a valid URL (e.g. https://drive.google.com/...)'
-      }
+    } else if (!isValidHttpUrl(driveLink)) {
+      newErrors.driveLink = 'Please enter a valid web URL starting with http:// or https://'
     }
 
     if (!assignToAll && selectedStudentIds.length === 0) {
@@ -116,8 +111,10 @@ export default function AssignmentForm({
     })
   }
 
+  const isPastDueDate = Boolean(dueDate && dueDate < getTodayDateString())
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 text-left">
+    <form onSubmit={handleSubmit} className="space-y-4 text-left" noValidate>
       {/* Title Field */}
       <div>
         <label htmlFor="assignment-title" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -132,12 +129,16 @@ export default function AssignmentForm({
             if (errors.title) setErrors((prev) => ({ ...prev, title: '' }))
           }}
           placeholder="e.g. CS101: Introduction to Algorithms"
+          aria-invalid={Boolean(errors.title)}
+          aria-describedby={errors.title ? 'title-error' : undefined}
           className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
             errors.title ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
           } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
         />
         {errors.title && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.title}</p>
+          <p id="title-error" role="alert" className="text-xs text-red-600 dark:text-red-400 mt-1">
+            {errors.title}
+          </p>
         )}
       </div>
 
@@ -170,12 +171,21 @@ export default function AssignmentForm({
               setDueDate(e.target.value)
               if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }))
             }}
+            aria-invalid={Boolean(errors.dueDate)}
+            aria-describedby={errors.dueDate ? 'due-error' : isPastDueDate ? 'due-past-note' : undefined}
             className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
               errors.dueDate ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
             } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
           />
           {errors.dueDate && (
-            <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.dueDate}</p>
+            <p id="due-error" role="alert" className="text-xs text-red-600 dark:text-red-400 mt-1">
+              {errors.dueDate}
+            </p>
+          )}
+          {!errors.dueDate && isPastDueDate && (
+            <p id="due-past-note" className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+              Note: This date is in the past. It will appear as overdue for students.
+            </p>
           )}
         </div>
 
@@ -192,12 +202,16 @@ export default function AssignmentForm({
               if (errors.driveLink) setErrors((prev) => ({ ...prev, driveLink: '' }))
             }}
             placeholder="https://drive.google.com/..."
+            aria-invalid={Boolean(errors.driveLink)}
+            aria-describedby={errors.driveLink ? 'drive-error' : undefined}
             className={`w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 ${
               errors.driveLink ? 'border-red-400 bg-red-50/30' : 'border-slate-300 dark:border-slate-700'
             } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
           />
           {errors.driveLink && (
-            <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.driveLink}</p>
+            <p id="drive-error" role="alert" className="text-xs text-red-600 dark:text-red-400 mt-1">
+              {errors.driveLink}
+            </p>
           )}
         </div>
       </div>
@@ -241,7 +255,9 @@ export default function AssignmentForm({
           </div>
         )}
         {errors.assignedTo && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.assignedTo}</p>
+          <p id="assigned-error" role="alert" className="text-xs text-red-600 dark:text-red-400 mt-1">
+            {errors.assignedTo}
+          </p>
         )}
       </div>
 

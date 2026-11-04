@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 
 /**
  * Custom hook to synchronize state with localStorage.
- * Falls back to initialValue if localStorage is empty or corrupted.
- * Optionally invokes onError callback when a parse or storage error occurs.
+ * - Reads on load with fallback to initialValue if empty or corrupted.
+ * - Saves on state change.
+ * - Listens for external changes across browser tabs.
  */
 export function useLocalStorage(key, initialValue, onError) {
   const [value, setValue] = useState(() => {
@@ -19,6 +20,7 @@ export function useLocalStorage(key, initialValue, onError) {
     return typeof initialValue === 'function' ? initialValue() : initialValue
   })
 
+  // Synchronize state changes to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(value))
@@ -27,6 +29,22 @@ export function useLocalStorage(key, initialValue, onError) {
       if (onError) onError(error)
     }
   }, [key, value, onError])
+
+  // Multi-tab synchronization: listen for changes made in other tabs
+  useEffect(() => {
+    const handleStorageEvent = (event) => {
+      if (event.key === key && event.newValue !== null) {
+        try {
+          setValue(JSON.parse(event.newValue))
+        } catch (error) {
+          console.warn(`Error parsing storage event for key "${key}":`, error)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageEvent)
+    return () => window.removeEventListener('storage', handleStorageEvent)
+  }, [key])
 
   return [value, setValue]
 }

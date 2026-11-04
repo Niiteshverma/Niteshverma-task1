@@ -6,8 +6,8 @@ export default function LoginPage() {
   const { currentUser, login } = useAuth()
   const navigate = useNavigate()
 
-  // If already logged in, redirect directly to their dashboard
-  if (currentUser) {
+  // If already logged in with a valid role, redirect directly to their dashboard
+  if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'student')) {
     return <Navigate to={currentUser.role === 'admin' ? '/admin' : '/student'} replace />
   }
 

@@ -1,29 +1,14 @@
+import { formatDueDate, isAssignmentOverdue } from '../../utils/dateUtils'
+import { isValidHttpUrl } from '../../utils/urlUtils'
+
 export default function AssignmentCard({ assignment, submission, onSubmitClick }) {
   const isSubmitted = submission?.status === 'Submitted'
-
-  // Determine if assignment is overdue (past due date and not yet submitted)
-  const isOverdue = !isSubmitted && Boolean(assignment.dueDate) && new Date(assignment.dueDate + 'T23:59:59') < new Date()
-
-  // Format date nicely (e.g. "Oct 15, 2026")
-  const formatDueDate = (dateString) => {
-    if (!dateString) return 'No due date'
-    const parts = dateString.split('-')
-    if (parts.length === 3) {
-      const year = parseInt(parts[0], 10)
-      const month = parseInt(parts[1], 10) - 1
-      const day = parseInt(parts[2], 10)
-      return new Date(year, month, day).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    }
-    return dateString
-  }
+  const isOverdue = isAssignmentOverdue(assignment.dueDate, isSubmitted)
+  const hasValidDriveLink = isValidHttpUrl(assignment.driveLink)
 
   return (
     <article
-      className={`bg-white dark:bg-slate-900 rounded-xl border p-5 shadow-sm transition flex flex-col justify-between ${
+      className={`bg-white dark:bg-slate-900 rounded-xl border p-5 shadow-sm transition flex flex-col justify-between overflow-hidden break-words ${
         isOverdue
           ? 'border-red-300 dark:border-red-800/80 bg-red-50/10'
           : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
@@ -31,14 +16,14 @@ export default function AssignmentCard({ assignment, submission, onSubmitClick }
     >
       <div>
         <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-snug">
+          <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-snug break-words">
             {assignment.title}
           </h3>
 
           <div className="flex flex-col items-end gap-1 shrink-0">
             {isOverdue && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
-                Overdue
+                <span className="mr-1" aria-hidden="true">&#9888;</span> Overdue
               </span>
             )}
             <span
@@ -48,12 +33,15 @@ export default function AssignmentCard({ assignment, submission, onSubmitClick }
                   : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
               }`}
             >
+              <span className="mr-1" aria-hidden="true">
+                {isSubmitted ? '✓' : '○'}
+              </span>
               {isSubmitted ? 'Submitted' : 'Not submitted'}
             </span>
           </div>
         </div>
 
-        <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3">
+        <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 break-words">
           {assignment.description}
         </p>
       </div>
@@ -65,7 +53,7 @@ export default function AssignmentCard({ assignment, submission, onSubmitClick }
             {formatDueDate(assignment.dueDate)}
           </div>
 
-          {assignment.driveLink && (
+          {hasValidDriveLink && (
             <a
               href={assignment.driveLink}
               target="_blank"
@@ -95,12 +83,12 @@ export default function AssignmentCard({ assignment, submission, onSubmitClick }
           <button
             type="button"
             onClick={() => onSubmitClick(assignment)}
-            className="w-full mt-2 py-2 px-3 text-xs sm:text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+            className="w-full mt-2 py-2.5 px-3 min-h-[40px] text-xs sm:text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
           >
             Yes, I have submitted
           </button>
         ) : (
-          <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium text-center py-1 bg-emerald-50/50 dark:bg-emerald-950/30 rounded border border-emerald-100 dark:border-emerald-900/50">
+          <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium text-center py-2 bg-emerald-50/50 dark:bg-emerald-950/30 rounded border border-emerald-100 dark:border-emerald-900/50">
             &#10003; Marked as submitted
           </div>
         )}

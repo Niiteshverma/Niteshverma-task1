@@ -1,4 +1,6 @@
 import StudentStatusList from './StudentStatusList'
+import { formatDueDate } from '../../utils/dateUtils'
+import { isValidHttpUrl } from '../../utils/urlUtils'
 
 export default function AdminAssignmentCard({
   assignment,
@@ -7,32 +9,16 @@ export default function AdminAssignmentCard({
   onEdit,
   onDelete,
 }) {
-  // Format readable due date (e.g. "Oct 15, 2026")
-  const formatDueDate = (dateString) => {
-    if (!dateString) return 'No due date'
-    const parts = dateString.split('-')
-    if (parts.length === 3) {
-      const year = parseInt(parts[0], 10)
-      const month = parseInt(parts[1], 10) - 1
-      const day = parseInt(parts[2], 10)
-      return new Date(year, month, day).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    }
-    return dateString
-  }
-
   const assignedCount = assignment.assignedTo ? assignment.assignedTo.length : 0
   const isAllStudents = assignedCount === allStudents.length
+  const hasValidDriveLink = isValidHttpUrl(assignment.driveLink)
 
   return (
-    <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between space-y-4">
+    <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between space-y-4 overflow-hidden break-words">
       <div className="space-y-3">
         {/* Title & Scope Badge */}
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-snug">
+          <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-snug break-words">
             {assignment.title}
           </h3>
           <span className="shrink-0 text-xs px-2.5 py-0.5 rounded-full font-medium bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">
@@ -41,7 +27,7 @@ export default function AdminAssignmentCard({
         </div>
 
         {/* Description */}
-        <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3">
+        <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 break-words">
           {assignment.description || 'No description provided.'}
         </p>
 
@@ -52,7 +38,7 @@ export default function AdminAssignmentCard({
             {formatDueDate(assignment.dueDate)}
           </div>
 
-          {assignment.driveLink && (
+          {hasValidDriveLink && (
             <a
               href={assignment.driveLink}
               target="_blank"
@@ -81,14 +67,14 @@ export default function AdminAssignmentCard({
         <button
           type="button"
           onClick={() => onEdit(assignment)}
-          className="px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+          className="px-3 py-1.5 min-h-[36px] text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
         >
           Edit
         </button>
         <button
           type="button"
           onClick={() => onDelete(assignment)}
-          className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition"
+          className="px-3 py-1.5 min-h-[36px] text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition"
         >
           Delete
         </button>

@@ -118,3 +118,4 @@ export const initialSubmissions = [
     submittedAt: '2026-10-19T11:30:00.000Z',
   },
 ]
+

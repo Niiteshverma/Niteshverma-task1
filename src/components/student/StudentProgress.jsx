@@ -1,7 +1,8 @@
 import ProgressBar from '../common/ProgressBar'
+import { getPercentage } from '../../utils/helpers'
 
 export default function StudentProgress({ submittedCount = 0, totalCount = 0 }) {
-  const percentage = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0
+  const percentage = getPercentage(submittedCount, totalCount)
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-3">

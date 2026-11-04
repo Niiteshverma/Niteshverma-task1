@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
+# Interview Notes (local only)
+INTERVIEW_NOTES.*
+

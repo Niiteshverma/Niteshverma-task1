@@ -1,104 +1,191 @@
-import { Navigate, useNavigate } from 'react-router-dom'
+// Sign-in page with email/password validation, demo quick-fill credentials, and role navigation
+import { useState } from 'react'
+import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { initialUsers } from '../data/seedData'
+import { useToast } from '../context/ToastContext'
 import { ROLES } from '../utils/constants'
-
-// Small internal component to render each clickable user card
-function UserCard({ user, onSelect }) {
-  const isAdmin = user.role === ROLES.ADMIN
-
-  return (
-    <button
-      type="button"
-      onClick={() => onSelect(user)}
-      className="flex items-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-left transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-    >
-      <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mr-3 transition ${isAdmin
-            ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white'
-            : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 group-hover:bg-emerald-600 group-hover:text-white'
-          }`}
-      >
-        {user.name.charAt(0)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
-          {user.name}
-        </p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">
-          {user.role} {isAdmin ? '• Manage Class' : ''}
-        </p>
-      </div>
-    </button>
-  )
-}
+import Card from '../components/ui/Card'
+import Input from '../components/ui/Input'
+import Button from '../components/ui/Button'
 
 export default function LoginPage() {
   const { currentUser, login } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
 
-  // Redirect if already authenticated
-  if (currentUser?.role === ROLES.ADMIN) return <Navigate to="/admin" replace />
-  if (currentUser?.role === ROLES.STUDENT) return <Navigate to="/student" replace />
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const admins = initialUsers.filter((u) => u.role === ROLES.ADMIN)
-  const students = initialUsers.filter((u) => u.role === ROLES.STUDENT)
+  // Redirect if already logged in
+  if (currentUser) {
+    const destination = currentUser.role === ROLES.PROFESSOR ? '/professor' : '/student'
+    return <Navigate to={destination} replace />
+  }
 
-  const handleSelectUser = (user) => {
-    login(user)
-    const destination = user.role === ROLES.ADMIN ? '/admin' : '/student'
+  const validate = () => {
+    const newErrors = {}
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail) {
+      newErrors.email = 'Email address is required'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      newErrors.email = 'Please enter a valid email address'
+    }
+
+    if (!password) {
+      newErrors.password = 'Password is required'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!validate()) return
+
+    setIsSubmitting(true)
+    const result = login(email, password)
+    setIsSubmitting(false)
+
+    if (!result.success) {
+      setErrors({ form: result.error })
+      return
+    }
+
+    showToast(`Welcome back, ${result.user.name}!`, 'success')
+    const destination = result.user.role === ROLES.PROFESSOR ? '/professor' : '/student'
     navigate(destination, { replace: true })
   }
 
+  const handleQuickFill = (demoEmail, demoPassword) => {
+    setEmail(demoEmail)
+    setPassword(demoPassword)
+    setErrors({})
+  }
+
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors">
-      <div className="max-w-2xl w-full bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 sm:p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl shadow-sm">
-            AR
-          </div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-            Assignment &amp; Review Dashboard
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Select a mock user profile below to sign in directly (no password needed).
-          </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600 text-white font-black text-xl shadow-md mb-3">
+          SM
         </div>
-
-        {/* Admin Accounts */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Professors  ({admins.length})
-            </h2>
-            <span className="text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full font-medium">
-              Create &amp; Review
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {admins.map((user) => (
-              <UserCard key={user.id} user={user} onSelect={handleSelectUser} />
-            ))}
-          </div>
-        </section>
-
-        {/* Student Accounts */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Students ({students.length})
-            </h2>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full font-medium">
-              Submit &amp; Track
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {students.map((user) => (
-              <UserCard key={user.id} user={user} onSelect={handleSelectUser} />
-            ))}
-          </div>
-        </section>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          Sign in to your account
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          Student, Group &amp; Assignment Management Portal
+        </p>
       </div>
-    </main>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
+        <Card className="shadow-lg border-slate-200/80 p-6 sm:p-8 space-y-6">
+          {errors.form && (
+            <div
+              role="alert"
+              className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-xs sm:text-sm font-medium text-rose-700"
+            >
+              {errors.form}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <Input
+              id="login-email"
+              name="email"
+              type="email"
+              label="Email address"
+              placeholder="e.g. student1@demo.com"
+              value={email}
+              error={errors.email}
+              required
+              autoComplete="email"
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (errors.email || errors.form) {
+                  setErrors((prev) => ({ ...prev, email: '', form: '' }))
+                }
+              }}
+            />
+
+            <Input
+              id="login-password"
+              name="password"
+              type="password"
+              label="Password"
+              placeholder="••••••••"
+              value={password}
+              error={errors.password}
+              required
+              autoComplete="current-password"
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (errors.password || errors.form) {
+                  setErrors((prev) => ({ ...prev, password: '', form: '' }))
+                }
+              }}
+            />
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isSubmitting}
+              className="w-full mt-2"
+            >
+              Sign In
+            </Button>
+          </form>
+
+          {/* Quick Demo Credentials */}
+          <div className="pt-4 border-t border-slate-100 space-y-2.5">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">
+              Quick Demo Accounts
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => handleQuickFill('student1@demo.com', 'password123')}
+                className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-left transition group"
+              >
+                <span className="font-bold text-slate-800 group-hover:text-indigo-700 block">
+                  Student Demo
+                </span>
+                <span className="text-[11px] text-slate-500 truncate block">
+                  student1@demo.com
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickFill('professor1@demo.com', 'password123')}
+                className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-purple-50 hover:border-purple-300 text-left transition group"
+              >
+                <span className="font-bold text-slate-800 group-hover:text-purple-700 block">
+                  Professor Demo
+                </span>
+                <span className="text-[11px] text-slate-500 truncate block">
+                  professor1@demo.com
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center pt-2">
+            <p className="text-xs text-slate-600">
+              Don&apos;t have an account?{' '}
+              <Link
+                to="/register"
+                className="font-semibold text-indigo-600 hover:text-indigo-700 transition"
+              >
+                Create an account
+              </Link>
+            </p>
+          </div>
+        </Card>
+      </div>
+    </div>
   )
 }

@@ -298,3 +298,4 @@ describe('Phase 2: Reusable UI Components & Toast System', () => {
     expect(screen.getByText('Failed to save group')).toBeInTheDocument()
   })
 })
+

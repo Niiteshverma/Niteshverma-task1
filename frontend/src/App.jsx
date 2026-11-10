@@ -3,10 +3,11 @@ import { ThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
 import { ToastProvider } from './context/ToastContext'
-import ProtectedRoute from './components/common/ProtectedRoute'
+import ProtectedRoute from './components/layout/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
-import AdminDashboard from './pages/AdminDashboard'
+import ProfessorDashboard from './pages/ProfessorDashboard'
 import { ROLES } from './utils/constants'
 
 export default function App() {
@@ -17,10 +18,12 @@ export default function App() {
           <ToastProvider>
             <BrowserRouter>
               <Routes>
-                {/* Public login */}
-                <Route path="/" element={<LoginPage />} />
+                {/* Public Authentication Routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
 
-                {/* Student dashboard */}
+                {/* Student Routes */}
                 <Route
                   path="/student"
                   element={
@@ -30,18 +33,18 @@ export default function App() {
                   }
                 />
 
-                {/* Admin dashboard */}
+                {/* Professor Routes */}
                 <Route
-                  path="/admin"
+                  path="/professor"
                   element={
-                    <ProtectedRoute allowedRole={ROLES.ADMIN}>
-                      <AdminDashboard />
+                    <ProtectedRoute allowedRole={ROLES.PROFESSOR}>
+                      <ProfessorDashboard />
                     </ProtectedRoute>
                   }
                 />
 
-                {/* Catch-all redirect */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Catch-all Fallback */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
             </BrowserRouter>
           </ToastProvider>

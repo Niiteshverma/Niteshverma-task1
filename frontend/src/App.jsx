@@ -7,6 +7,7 @@ import ProtectedRoute from './components/layout/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import StudentDashboard from './pages/StudentDashboard'
+import CourseAssignmentsPage from './pages/CourseAssignmentsPage'
 import ProfessorDashboard from './pages/ProfessorDashboard'
 import { ROLES } from './utils/constants'
 
@@ -29,6 +30,14 @@ export default function App() {
                   element={
                     <ProtectedRoute allowedRole={ROLES.STUDENT}>
                       <StudentDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/student/courses/:courseId"
+                  element={
+                    <ProtectedRoute allowedRole={ROLES.STUDENT}>
+                      <CourseAssignmentsPage />
                     </ProtectedRoute>
                   }
                 />

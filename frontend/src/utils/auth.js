@@ -56,3 +56,4 @@ export function validateSession(session, users = []) {
 
   return user
 }
+

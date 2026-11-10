@@ -51,6 +51,14 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/professor/courses/:courseId"
+                  element={
+                    <ProtectedRoute allowedRole={ROLES.PROFESSOR}>
+                      <CourseAssignmentsPage />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Catch-all Fallback */}
                 <Route path="*" element={<Navigate to="/login" replace />} />

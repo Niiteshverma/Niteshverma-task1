@@ -10,6 +10,8 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import AssignmentCard from '../components/student/AssignmentCard'
 import GroupPanel from '../components/student/GroupPanel'
 import AssignmentForm from '../components/professor/AssignmentForm'
+import AssignmentTracking from '../components/professor/AssignmentTracking'
+import ProgressBar from '../components/ui/ProgressBar'
 import Loader from '../components/ui/Loader'
 import EmptyState from '../components/ui/EmptyState'
 import Badge from '../components/ui/Badge'
@@ -17,7 +19,7 @@ import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
 import { useToast } from '../context/ToastContext'
 import { LOADING_DELAY, ROLES, SUBMISSION_TYPE } from '../utils/constants'
-import { formatDateTime, isValidUrl } from '../utils/helpers'
+import { formatDateTime, isValidUrl, getPercentage } from '../utils/helpers'
 
 export default function CourseAssignmentsPage() {
   const { courseId } = useParams()
@@ -28,7 +30,9 @@ export default function CourseAssignmentsPage() {
     getUserById,
     getAssignmentsForCourse,
     getGroupForStudent,
+    getGroupsForCourse,
     getAcknowledgement,
+    getAcknowledgementsForAssignment,
     createAssignment,
     updateAssignment,
     deleteAssignment,
@@ -40,6 +44,7 @@ export default function CourseAssignmentsPage() {
   const [editingAssignment, setEditingAssignment] = useState(null)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [assignmentToDelete, setAssignmentToDelete] = useState(null)
+  const [trackingAssignment, setTrackingAssignment] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -198,6 +203,12 @@ export default function CourseAssignmentsPage() {
                     if (isProfessor) {
                       const isGroup = assignment.submissionType === SUBMISSION_TYPE.GROUP
                       const hasLink = isValidUrl(assignment.oneDriveLink)
+                      const acks = getAcknowledgementsForAssignment(assignment.id)
+                      const totalExpected = isGroup
+                        ? getGroupsForCourse(course.id).length
+                        : course.studentIds?.length || 0
+                      const ackCount = acks.length
+                      const percentage = getPercentage(ackCount, totalExpected)
 
                       return (
                         <Card
@@ -264,24 +275,47 @@ export default function CourseAssignmentsPage() {
                               )}
                             </div>
 
+                            {/* Submissions Progress Indicator */}
+                            <div className="space-y-1.5 pt-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-500 font-medium">Submissions</span>
+                                <span className="font-semibold text-slate-800">
+                                  {ackCount} / {totalExpected} {isGroup ? 'groups' : 'students'} ({percentage}%)
+                                </span>
+                              </div>
+                              <ProgressBar value={ackCount} max={totalExpected} size="sm" />
+                            </div>
+
                             {/* Professor action buttons */}
-                            <div className="flex items-center justify-end gap-2.5 pt-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
                               <Button
                                 type="button"
-                                variant="secondary"
+                                variant="primary"
                                 size="sm"
-                                onClick={() => handleOpenEditModal(assignment)}
+                                onClick={() => setTrackingAssignment(assignment)}
+                                className="text-xs"
                               >
-                                Edit
+                                Track Submissions
                               </Button>
-                              <Button
-                                type="button"
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handlePromptDelete(assignment)}
-                              >
-                                Delete
-                              </Button>
+
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => handleOpenEditModal(assignment)}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => handlePromptDelete(assignment)}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </Card>
@@ -349,6 +383,23 @@ export default function CourseAssignmentsPage() {
           variant="danger"
           isLoading={isSubmitting}
         />
+      )}
+
+      {/* Submission Tracking Drill-Down Modal */}
+      {isProfessor && (
+        <Modal
+          isOpen={Boolean(trackingAssignment)}
+          onClose={() => setTrackingAssignment(null)}
+          title={trackingAssignment ? `Track: ${trackingAssignment.title}` : 'Track Submissions'}
+          maxWidth="max-w-3xl"
+        >
+          {trackingAssignment && (
+            <AssignmentTracking
+              assignment={trackingAssignment}
+              course={course}
+            />
+          )}
+        </Modal>
       )}
     </div>
   )

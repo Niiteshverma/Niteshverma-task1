@@ -46,3 +46,4 @@ export default function CourseCard({ course, onOpen }) {
     </Card>
   )
 }
+

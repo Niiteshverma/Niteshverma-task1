@@ -10,7 +10,6 @@ export function useLocalStorage(key, initialValue, onError) {
         return JSON.parse(saved)
       }
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error)
       if (onError) onError(error)
     }
     return typeof initialValue === 'function' ? initialValue() : initialValue
@@ -21,7 +20,6 @@ export function useLocalStorage(key, initialValue, onError) {
     try {
       localStorage.setItem(key, JSON.stringify(value))
     } catch (error) {
-      console.error(`Error saving localStorage key "${key}":`, error)
       if (onError) onError(error)
     }
   }, [key, value, onError])
@@ -32,8 +30,8 @@ export function useLocalStorage(key, initialValue, onError) {
       if (event.key === key && event.newValue !== null) {
         try {
           setValue(JSON.parse(event.newValue))
-        } catch (error) {
-          console.warn(`Error parsing storage event for "${key}":`, error)
+        } catch {
+          // Ignore parse errors from other tabs
         }
       }
     }

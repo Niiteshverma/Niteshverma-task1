@@ -71,7 +71,7 @@ export default function GroupPanel({ courseId }) {
 
   return (
     <>
-      <Card className="border-slate-200 text-left space-y-5">
+      <Card id="group-section" className="border-slate-200 text-left space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-slate-900">

@@ -167,3 +167,4 @@ describe('Phase 6: Groups Management Test Suite', () => {
     expect(secondJoinRes.error).toContain('already in a group')
   })
 })
+

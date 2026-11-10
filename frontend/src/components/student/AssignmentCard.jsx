@@ -23,6 +23,7 @@ export default function AssignmentCard({
 
   const currentUser = propUser || authContext?.currentUser
   const acknowledgeAssignment = dataContext?.acknowledgeAssignment
+  const getUserById = dataContext?.getUserById
   const showToast = toastContext?.showToast || (() => {})
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
@@ -33,6 +34,16 @@ export default function AssignmentCard({
   const overdue = !isAcknowledged && isOverdue(assignment.deadline)
   const dueSoon = !isAcknowledged && isDueSoon(assignment.deadline)
   const hasValidLink = isValidUrl(assignment.oneDriveLink)
+
+  // Group roles & leader identification
+  const leader =
+    studentGroup?.leaderId && getUserById
+      ? getUserById(studentGroup.leaderId)
+      : null
+  const leaderName = leader ? leader.name : 'the group leader'
+  const isLeader = Boolean(
+    currentUser && studentGroup && studentGroup.leaderId === currentUser.id
+  )
 
   // Check if acknowledged after the specified deadline
   const isSubmittedLate =
@@ -57,6 +68,31 @@ export default function AssignmentCard({
 
     if (result) {
       showToast('Assignment acknowledged successfully!', 'success')
+    }
+  }
+
+  // Handler for group submission confirmation
+  const handleConfirmGroupAcknowledge = () => {
+    if (
+      !currentUser ||
+      isSubmitting ||
+      isAcknowledged ||
+      !acknowledgeAssignment ||
+      !studentGroup
+    )
+      return
+
+    setIsSubmitting(true)
+    const result = acknowledgeAssignment({
+      assignmentId: assignment.id,
+      groupId: studentGroup.id,
+      userId: currentUser.id,
+    })
+    setIsSubmitting(false)
+    setIsConfirmOpen(false)
+
+    if (result) {
+      showToast(`Assignment submitted on behalf of ${studentGroup.name}!`, 'success')
     }
   }
 
@@ -209,7 +245,100 @@ export default function AssignmentCard({
             </div>
           )}
 
-          {/* Group submission slots (extended in Phase 7) */}
+          {/* Group submission workflow */}
+          {isGroupSubmission && (
+            <div className="pt-1">
+              {!studentGroup ? (
+                <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200/90 text-xs text-amber-900 space-y-2">
+                  <p className="font-medium leading-relaxed">
+                    You need to join or create a group to acknowledge this assignment.
+                  </p>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const elem = document.getElementById('group-section')
+                        if (elem) {
+                          elem.scrollIntoView({ behavior: 'smooth' })
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 font-semibold text-amber-950 hover:underline cursor-pointer bg-amber-100/70 hover:bg-amber-100 px-2.5 py-1 rounded-md border border-amber-300/60 transition"
+                    >
+                      <span>Join or create a group</span>
+                      <span aria-hidden="true">&uarr;</span>
+                    </button>
+                  </div>
+                </div>
+              ) : isAcknowledged ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-900">
+                  <div className="flex items-center gap-2 font-medium">
+                    <svg
+                      className="w-4 h-4 text-emerald-600 shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2.5"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>
+                      {isLeader
+                        ? `Acknowledged by you on behalf of ${studentGroup.name} on ${formatDateTime(
+                            acknowledgement.acknowledgedAt
+                          )}`
+                        : `Acknowledged by ${leaderName} on ${formatDateTime(
+                            acknowledgement.acknowledgedAt
+                          )}`}
+                    </span>
+                  </div>
+
+                  {isSubmittedLate && (
+                    <Badge variant="warning" size="sm">
+                      Submitted late
+                    </Badge>
+                  )}
+                </div>
+              ) : !isLeader ? (
+                <div className="p-3 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 text-slate-500 shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>
+                    Only the group leader (
+                    <span className="font-semibold text-slate-900">{leaderName}</span>
+                    ) can submit for your group.
+                  </span>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setIsConfirmOpen(true)}
+                  className="w-full sm:w-auto text-xs"
+                >
+                  Submit for {studentGroup.name}
+                </Button>
+              )}
+            </div>
+          )}
+
           {children}
         </div>
       </Card>
@@ -218,19 +347,38 @@ export default function AssignmentCard({
       <ConfirmDialog
         isOpen={isConfirmOpen}
         onClose={() => !isSubmitting && setIsConfirmOpen(false)}
-        onConfirm={handleConfirmIndividualAcknowledge}
-        title="Confirm Assignment Submission"
-        message="Are you sure you have submitted your work for this assignment? This will permanently record your submission timestamp."
-        confirmText="Yes, Confirm"
+        onConfirm={
+          isGroupSubmission
+            ? handleConfirmGroupAcknowledge
+            : handleConfirmIndividualAcknowledge
+        }
+        title={
+          isGroupSubmission
+            ? `Submit for ${studentGroup?.name || 'Group'}`
+            : 'Confirm Assignment Submission'
+        }
+        message={
+          isGroupSubmission
+            ? `You are submitting on behalf of ${studentGroup?.name} (${
+                studentGroup?.memberIds?.length || 0
+              } members). This cannot be undone.`
+            : 'Are you sure you have submitted your work for this assignment? This will permanently record your submission timestamp.'
+        }
+        confirmText={isGroupSubmission ? 'Confirm Submission' : 'Yes, Confirm'}
         cancelText="Cancel"
         variant="primary"
         isLoading={isSubmitting}
       >
-        <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1">
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1 text-left">
           <p className="font-semibold text-slate-800">{assignment.title}</p>
           <p className="text-slate-500">
             Due: {formatDateTime(assignment.deadline)}
           </p>
+          {isGroupSubmission && studentGroup && (
+            <p className="text-indigo-600 font-medium pt-1">
+              Group: {studentGroup.name} • {studentGroup.memberIds.length} members
+            </p>
+          )}
         </div>
       </ConfirmDialog>
     </>

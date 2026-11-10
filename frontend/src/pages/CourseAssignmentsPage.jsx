@@ -12,6 +12,8 @@ import GroupPanel from '../components/student/GroupPanel'
 import AssignmentForm from '../components/professor/AssignmentForm'
 import AssignmentTracking from '../components/professor/AssignmentTracking'
 import ProgressBar from '../components/ui/ProgressBar'
+import Input from '../components/ui/Input'
+import Select from '../components/ui/Select'
 import Loader from '../components/ui/Loader'
 import EmptyState from '../components/ui/EmptyState'
 import Badge from '../components/ui/Badge'
@@ -47,6 +49,11 @@ export default function CourseAssignmentsPage() {
   const [trackingAssignment, setTrackingAssignment] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Filters and search states (Phase 10)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState('all') // 'all' | 'individual' | 'group'
+  const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'pending' | 'acknowledged'
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false)
@@ -68,6 +75,52 @@ export default function CourseAssignmentsPage() {
   const assignments = course ? getAssignmentsForCourse(course.id) : []
   const studentGroup =
     !isProfessor && currentUser ? getGroupForStudent(courseId, currentUser.id) : null
+
+  // Filter assignments by search query, submission type, and acknowledgement status
+  const filteredAssignments = assignments.filter((assignment) => {
+    // 1. Search Query (title or description)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      const matchesTitle = assignment.title.toLowerCase().includes(query)
+      const matchesDesc = assignment.description
+        ? assignment.description.toLowerCase().includes(query)
+        : false
+      if (!matchesTitle && !matchesDesc) return false
+    }
+
+    // 2. Type Filter (individual / group)
+    if (typeFilter !== 'all' && assignment.submissionType !== typeFilter) {
+      return false
+    }
+
+    // 3. Status Filter (acknowledged / pending)
+    if (statusFilter !== 'all') {
+      let isAck = false
+      if (isProfessor) {
+        const acks = getAcknowledgementsForAssignment(assignment.id)
+        isAck = acks.length > 0
+      } else {
+        const ack =
+          assignment.submissionType === 'group'
+            ? studentGroup
+              ? getAcknowledgement(assignment.id, null, studentGroup.id)
+              : null
+            : getAcknowledgement(assignment.id, currentUser?.id, null)
+        isAck = Boolean(ack)
+      }
+
+      if (statusFilter === 'acknowledged' && !isAck) return false
+      if (statusFilter === 'pending' && isAck) return false
+    }
+
+    return true
+  })
+
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setTypeFilter('all')
+    setStatusFilter('all')
+  }
 
   // Handler: Open modal for creating a new assignment
   const handleOpenCreateModal = () => {
@@ -180,11 +233,68 @@ export default function CourseAssignmentsPage() {
 
             {/* Assignments Section */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                   Assignments ({assignments.length})
                 </h2>
               </div>
+
+              {/* Filters & Search Control Bar */}
+              {assignments.length > 0 && (
+                <div className="p-4 rounded-xl bg-white border border-slate-200/90 shadow-2xs space-y-3 text-left">
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                    <div className="sm:col-span-6">
+                      <Input
+                        id="assignment-search"
+                        placeholder="Search assignments by title..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <Select
+                        id="assignment-type-filter"
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        options={[
+                          { value: 'all', label: 'All Types' },
+                          { value: SUBMISSION_TYPE.INDIVIDUAL, label: 'Individual Only' },
+                          { value: SUBMISSION_TYPE.GROUP, label: 'Group Only' },
+                        ]}
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <Select
+                        id="assignment-status-filter"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        options={[
+                          { value: 'all', label: 'All Statuses' },
+                          { value: 'pending', label: 'Pending Only' },
+                          { value: 'acknowledged', label: 'Acknowledged Only' },
+                        ]}
+                      />
+                    </div>
+                  </div>
+
+                  {(searchQuery || typeFilter !== 'all' || statusFilter !== 'all') && (
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                      <span className="text-slate-500 font-medium">
+                        Showing {filteredAssignments.length} of {assignments.length} assignments
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleResetFilters}
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition underline cursor-pointer"
+                      >
+                        Reset Filters
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {assignments.length === 0 ? (
                 <EmptyState
@@ -197,9 +307,16 @@ export default function CourseAssignmentsPage() {
                   actionLabel={isProfessor ? '+ Create Assignment' : undefined}
                   onAction={isProfessor ? handleOpenCreateModal : undefined}
                 />
+              ) : filteredAssignments.length === 0 ? (
+                <EmptyState
+                  title="No assignments match your filters"
+                  description="Try clearing your search query or changing your filter criteria."
+                  actionLabel="Reset Filters"
+                  onAction={handleResetFilters}
+                />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {assignments.map((assignment) => {
+                  {filteredAssignments.map((assignment) => {
                     if (isProfessor) {
                       const isGroup = assignment.submissionType === SUBMISSION_TYPE.GROUP
                       const hasLink = isValidUrl(assignment.oneDriveLink)

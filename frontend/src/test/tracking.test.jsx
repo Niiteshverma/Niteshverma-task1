@@ -116,7 +116,7 @@ describe('Phase 9: Professor Tracking & Drill-down Test Suite', () => {
     const trackButtons = await screen.findAllByRole('button', { name: /Track Submissions/i })
     fireEvent.click(trackButtons[0])
 
-    const filterSelect = await screen.findByRole('combobox')
+    const filterSelect = await screen.findByDisplayValue('All Submissions')
 
     // Filter to Acknowledged only
     fireEvent.change(filterSelect, { target: { value: 'acknowledged' } })

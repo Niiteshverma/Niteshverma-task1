@@ -15,9 +15,9 @@ export default function Button({
     'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none'
 
   const sizeStyles = {
-    sm: 'text-xs px-2.5 py-1.5 gap-1.5',
-    md: 'text-sm px-4 py-2 gap-2 min-h-[40px]',
-    lg: 'text-base px-5 py-2.5 gap-2.5 min-h-[44px]',
+    sm: 'text-xs px-2.5 py-1.5 gap-1.5 min-h-[36px] sm:min-h-0',
+    md: 'text-sm px-4 py-2 gap-2 min-h-[44px]',
+    lg: 'text-base px-5 py-2.5 gap-2.5 min-h-[48px]',
   }
 
   const variantStyles = {

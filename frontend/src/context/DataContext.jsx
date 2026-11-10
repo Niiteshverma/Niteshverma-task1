@@ -10,7 +10,7 @@ import {
   initialAcknowledgements,
 } from '../data/seedData'
 
-const DataContext = createContext(null)
+export const DataContext = createContext(null)
 
 export function DataProvider({ children }) {
   const [storageError, setStorageError] = useState(null)

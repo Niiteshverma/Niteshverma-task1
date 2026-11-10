@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useCallback } from 'react'
 import { TOAST_DURATION } from '../utils/constants'
 import Toast from '../components/ui/Toast'
 
-const ToastContext = createContext(null)
+export const ToastContext = createContext(null)
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])

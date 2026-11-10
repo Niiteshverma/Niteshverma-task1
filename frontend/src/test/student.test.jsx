@@ -154,3 +154,4 @@ describe('Phase 4: Student Dashboard & Course Assignments Page Test Suite', () =
     ).toBeInTheDocument()
   })
 })
+

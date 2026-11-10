@@ -5,7 +5,7 @@ import { STORAGE_KEYS } from '../utils/constants'
 import { createToken, validateSession } from '../utils/auth'
 import { useData } from './DataContext'
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const { users, addUser } = useData()

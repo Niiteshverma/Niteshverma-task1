@@ -251,7 +251,7 @@ export default function AssignmentCard({
               {!studentGroup ? (
                 <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200/90 text-xs text-amber-900 space-y-2">
                   <p className="font-medium leading-relaxed">
-                    You need to join or create a group to acknowledge this assignment.
+                    You are not part of any group. Create or join one to submit this assignment.
                   </p>
                   <div>
                     <button
@@ -264,7 +264,7 @@ export default function AssignmentCard({
                       }}
                       className="inline-flex items-center gap-1 font-semibold text-amber-950 hover:underline cursor-pointer bg-amber-100/70 hover:bg-amber-100 px-2.5 py-1 rounded-md border border-amber-300/60 transition"
                     >
-                      <span>Join or create a group</span>
+                      <span>Create or join a group</span>
                       <span aria-hidden="true">&uarr;</span>
                     </button>
                   </div>

@@ -62,7 +62,7 @@ describe('Phase 7: Group Acknowledgement Flow Test Suite', () => {
 
     // Should display notice to join or create group
     expect(
-      screen.getByText(/You need to join or create a group to acknowledge this assignment/i)
+      screen.getByText(/You are not part of any group\. Create or join one to submit this assignment\./i)
     ).toBeInTheDocument()
 
     // Must NOT show any submit button for group assignment

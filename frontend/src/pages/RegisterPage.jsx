@@ -91,7 +91,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-10 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600 text-white font-black text-xl shadow-md mb-3">
-          SM
+          NV
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Create an account

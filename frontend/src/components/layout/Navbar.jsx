@@ -25,7 +25,7 @@ export default function Navbar() {
         {/* Brand */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-            SM
+            NV
           </div>
           <div>
             <span className="font-bold text-slate-900 tracking-tight text-base sm:text-lg block leading-none">

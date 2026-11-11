@@ -1,0 +1,12 @@
+{
+  "name": "niteshverma-task1",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend test"
+  }
+}

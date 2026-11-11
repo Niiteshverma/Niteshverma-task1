@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { ThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
 import { ToastProvider } from './context/ToastContext'
@@ -13,11 +12,10 @@ import { ROLES } from './utils/constants'
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <DataProvider>
-          <ToastProvider>
-            <BrowserRouter>
+    <AuthProvider>
+      <DataProvider>
+        <ToastProvider>
+          <BrowserRouter>
               <Routes>
                 {/* Public Authentication Routes */}
                 <Route path="/login" element={<LoginPage />} />
@@ -63,10 +61,9 @@ export default function App() {
                 {/* Catch-all Fallback */}
                 <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
-            </BrowserRouter>
-          </ToastProvider>
-        </DataProvider>
-      </AuthProvider>
-    </ThemeProvider>
+          </BrowserRouter>
+        </ToastProvider>
+      </DataProvider>
+    </AuthProvider>
   )
 }

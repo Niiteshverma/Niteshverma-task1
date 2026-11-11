@@ -1,182 +1,161 @@
-# Assignment & Review Dashboard
+# Student, Group & Assignment Management System
+### Round 2 Frontend Enhancement — Clean UI/UX & Role-Based Workflows
 
-A responsive, client-side student-assignment and review platform built with React, Vite, and Tailwind CSS. The application supports two distinct user roles—**Students** and **Admins (Professors)**—with zero backend dependencies by persisting state directly in `localStorage`.
+A responsive, client-side academic coursework, group collaboration, and assignment acknowledgement platform built with **React 18**, **Vite**, **Tailwind CSS**, and **React Router v6**. 
 
----
-
-## Features Overview
-
-### Role-Based Access & Authentication
-- **Mock User Switcher**: Quickly sign in as any of the 2 pre-seeded professors or 5 students with a single click.
-- **Protected Routing**: Role-specific dashboards (`/student` and `/admin`). Students cannot access the admin area and professors cannot access student views. Logged-out users are redirected to `/`.
-- **Session Persistence**: Active user session is saved in `localStorage` and persists across page reloads.
-
-### Student Experience
-- **Personalized Assignment Feed**: Students see only the assignments specifically assigned to them.
-- **Two-Step Submission Flow**: Click *"Yes, I have submitted"* to trigger a modal confirmation dialog. Confirmed submissions update status immediately and hide the submission button.
-- **Overall Progress Tracker**: Visual progress bar indicating completed tasks (e.g., *"3 of 5 submitted (60%)"*).
-- **Status Filter & Sorting (Bonus)**: Filter assignments by *All*, *Pending*, or *Submitted*, and sort by due date (*Soonest first* / *Latest first*).
-- **Overdue Indicator (Bonus)**: Unsubmitted assignments with past due dates are highlighted with an *Overdue* badge.
-- **External Resources**: Open Google Drive assignment materials in a new tab with secure `rel="noopener noreferrer"`.
-
-### Admin (Professor) Experience
-- **Author Isolation**: Professors view and manage only assignments they created (`createdBy === admin.id`).
-- **Assignment Creation & Editing**: Create new assignments or edit existing ones using a modal form with title, description, due date, Google Drive link, and targeted student selection.
-- **Selective Audience Targeting**: Assign to all students with one click or pick specific students using individual checkboxes.
-- **Cascade Deletion**: Confirmation dialog before deleting an assignment; cascades to remove all associated student submission records.
-- **Class Submission Tracking**: Expandable per-student status list and completion progress bar (e.g., *"3 of 5 students submitted (60%)"*).
-
-### General & Polish
-- **Dark Mode (Bonus)**: Seamless theme switcher toggling between light and dark modes with persistent user preference in `localStorage`.
-- **Loading & Empty States**: Simulated ~500ms loader and tailored empty states for both roles.
-- **Storage Corruption Recovery**: Error state if `localStorage` data is corrupted, complete with a *"Reset data"* button to safely reload seeds.
-- **Accessibility**: Semantic HTML, visible focus styles, ARIA roles for dialogs (`role="dialog"`, `aria-modal="true"`) and progress bars (`role="progressbar"`), and labeled form controls.
-- **Responsive Layout**: Designed for mobile (360px), tablet (768px), and desktop (1280px+).
+The application delivers tailored role-based workflows for **Students** and **Professors** with real-time tracking, group workspaces, simulated JWT sessions, and zero third-party UI or toast dependencies.
 
 ---
 
-## Tech Stack
+## 🔗 Live Links & Submission Details
 
-- **React 18** (JavaScript, functional components, hooks)
-- **Vite** (Build tool and fast local dev server)
-- **Tailwind CSS** (Utility-first styling with dark mode support)
-- **React Router v6** (`BrowserRouter`, `Routes`, `Route`, `Navigate`)
-- **Context API** (`AuthContext`, `DataContext`, `ThemeContext`)
-- **Web Storage API** (`localStorage` via custom `useLocalStorage` hook)
-- **Native Web Crypto** (`crypto.randomUUID()` for unique identifiers)
+- **Live Deployment (Vercel)**: [https://niteshverma-task1.vercel.app/](https://niteshverma-task1.vercel.app/)
+- **GitHub Repository**: [https://github.com/Niiteshverma/Niteshverma-task1](https://github.com/Niiteshverma/Niteshverma-task1)
+- **Demo Video Walkthrough**: [Google Drive Demo Video](https://drive.google.com/file/d/1XtpOdhxhspeAQxfheXryY_Xdnn56gW4-/view?usp=drive_link)
+- **Candidate Name**: Nitesh Verma
+- **Registered Email**: `niiteshverma@gmail.com`
 
 ---
 
-## Setup & Running Locally
+## 🔑 Demo Credentials
+
+| Role | Email | Password | Details |
+| :--- | :--- | :--- | :--- |
+| **Student (Leader)** | `student1@demo.com` | `demo123` | Enrolled in CS301, CS401, CS450. Leader of *Frontend Pioneers*. |
+| **Student (Member)** | `student2@demo.com` | `demo123` | Enrolled in CS301, CS305, CS450. Member of *Frontend Pioneers*. |
+| **Student (Unassigned)**| `student5@demo.com` | `demo123` | Enrolled in CS401, CS305, CS450. Unassigned in CS401. |
+| **Professor (Sarah)** | `professor1@demo.com` | `demo123` | Teaches CS301 and CS401. |
+| **Professor (Alan)** | `professor2@demo.com` | `demo123` | Teaches CS305 and CS450. |
+
+*You can also register brand-new Student and Professor accounts directly on the `/register` page.*
+
+---
+
+## 🛠️ Tech Stack & Philosophy
+
+- **Framework**: React 18 (Functional Components, Custom Hooks)
+- **Build Tool**: Vite (Lightning-fast HMR and optimized production chunks)
+- **Styling**: Tailwind CSS (Clean utility design system, no CSS sprawl, custom colors, focus rings)
+- **Navigation**: React Router v6 (Nested routes, layout preservation, dynamic splats)
+- **State Management**: React Context API (`AuthContext`, `DataContext`, `ToastContext`, `ThemeContext`)
+- **Mock Database / Persistence**: Web Storage API (`localStorage` with JSON validation and fallback recovery)
+- **ID Generation**: Native Web Crypto (`crypto.randomUUID()`)
+- **Testing**: Vitest + React Testing Library (67 automated unit and integration tests across 10 test suites)
+- **Zero Heavy UI Libraries**: Built without MUI, Chakra UI, Ant Design, or external toast libraries. Every component (`Button`, `Card`, `Modal`, `ConfirmDialog`, `Input`, `Select`, `Textarea`, `Badge`, `ProgressBar`, `EmptyState`, `Toast`) is custom-crafted in `src/components/ui/`.
+
+---
+
+## 🚀 Key Architectural & Product Decisions
+
+### 1. Plain Text Mock Password Rationale
+> [!NOTE]
+> In this client-side prototype, user passwords are stored in plain text inside `localStorage` for mock authentication. In any production software, passwords must never be stored in plain text or handled client-side; they must be securely salted and hashed using Argon2 or bcrypt on an isolated backend service.
+
+### 2. Simulated JWT Token Session
+- Upon successful login or registration, a simulated JWT-style session token is generated: a base64-encoded payload containing `{ userId, role, expiresAt }` with a **1-hour expiration**.
+- On application load and on every protected route transition, the token is verified for integrity and expiration. Expired or tampered tokens immediately purge the session and redirect to `/login`.
+
+### 3. Normalized Client-Side Data Architecture
+The data model mimics a relational SQL/NoSQL schema stored in separate `localStorage` keys:
+- `users`: `{ id, name, email, password, role }`
+- `courses`: `{ id, name, code, professorId, studentIds: [] }`
+- `assignments`: `{ id, courseId, title, description, deadline, oneDriveLink, submissionType, createdAt }`
+- `groups`: `{ id, courseId, name, leaderId, memberIds: [] }`
+- `acknowledgements`: `{ id, assignmentId, studentId, groupId, acknowledgedBy, acknowledgedAt }`
+
+### 4. Registration & Auto-Enrollment Workflow
+- **New Student**: Auto-enrolled into all existing courses upon registration so they immediately have access to course materials.
+- **New Professor**: Starts with an empty dashboard and can create courses (`+ Create Course`). Whenever a course is created, all registered students are automatically enrolled.
+
+### 5. Group Assignment & Leadership Flow
+- A student can belong to **at most one group per course**.
+- For group assignments, **only the designated group leader** can submit the acknowledgement on behalf of their group.
+- Submissions require a two-step `ConfirmDialog` detailing group name and member count.
+- Once submitted, the acknowledgement is instantly synchronized for all other group members, displaying who acknowledged it and when.
+- Late submissions (submitted after the ISO deadline) automatically display a `"Submitted late"` warning badge for both individual and group coursework.
+
+---
+
+## 💻 Quick Start & Running Locally
 
 ### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm or yarn
+- Node.js (v18.0.0 or higher recommended)
+- npm or pnpm
 
-### Installation
-1. Clone or extract the repository to your local machine.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### 1. Clone the repository
+```bash
+git clone https://github.com/Niiteshverma/Niteshverma-task1.git
+cd "NITESH VERMA taskno-1/frontend"
+```
 
-### Development Server
-Run the local Vite development server:
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Run development server
 ```bash
 npm run dev
 ```
-Open your browser and navigate to `http://localhost:5173/`.
+Open `http://localhost:5173` in your browser.
 
-### Testing
-Run unit and integration tests with Vitest:
+### 4. Run automated test suites
 ```bash
 npm test
 ```
+Executes all 67 unit and integration tests with Vitest in headless JSDOM.
 
-### Production Build & Preview
-To create an optimized production build:
+### 5. Build for production
 ```bash
 npm run build
 ```
-To preview the production build locally:
-```bash
-npm run preview
+Generates minified, production-ready assets inside the `frontend/dist` directory.
+
+---
+
+## 📁 Project Structure
+
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── layout/       # Navbar, ProtectedRoute
+│   │   ├── professor/    # CourseCard, AssignmentForm, AssignmentTracking
+│   │   ├── student/      # CourseCard, AssignmentCard, GroupPanel
+│   │   └── ui/           # Button, Card, Input, Select, Textarea, Modal, ConfirmDialog,
+│   │                     # Badge, ProgressBar, Loader, EmptyState, PageHeader, Toast
+│   ├── context/          # AuthContext, DataContext, ToastContext, ThemeContext
+│   ├── data/             # seedData.js (Professors, Students, Courses, Groups, Assignments)
+│   ├── hooks/            # useLocalStorage
+│   ├── pages/            # LoginPage, RegisterPage, StudentDashboard, ProfessorDashboard,
+│   │                     # CourseAssignmentsPage
+│   ├── test/             # 10 comprehensive Vitest test suites (67 tests)
+│   ├── utils/            # constants.js, helpers.js, auth.js
+│   ├── App.jsx           # Main application routing and providers
+│   └── main.jsx          # React DOM entrypoint
+├── vercel.json           # SPA rewrites configuration for clean URL routing
+└── package.json
 ```
 
 ---
 
-## Folder Structure
+## 🧪 Test Suite Summary
 
-```
-src/
-├── components/
-│   ├── admin/
-│   │   ├── AdminAssignmentCard.jsx   # Assignment card for professors with tracking
-│   │   ├── AssignmentForm.jsx        # Create & edit modal form with validation
-│   │   └── StudentStatusList.jsx     # Per-student status checklist & completion bar
-│   ├── common/
-│   │   ├── EmptyState.jsx            # Friendly placeholder when no data exists
-│   │   ├── ErrorState.jsx            # Fallback error card with Reset action
-│   │   ├── Header.jsx                # Top navbar with user badge, theme toggle & logout
-│   │   ├── Loader.jsx                # Animated loading spinner
-│   │   ├── Modal.jsx                 # Accessible dialog with backdrop and Escape listener
-│   │   ├── ProgressBar.jsx           # Reusable clamped progress indicator
-│   │   └── ProtectedRoute.jsx        # Role-based route guard
-│   └── student/
-│       ├── AssignmentCard.jsx        # Student card with submission trigger & Drive link
-│       └── StudentProgress.jsx       # Student overall completion summary & bar
-├── context/
-│   ├── AuthContext.jsx               # Current user session and login/logout handlers
-│   ├── DataContext.jsx               # Assignments, submissions, CRUD & cascade actions
-│   └── ThemeContext.jsx              # Light / Dark theme management
-├── data/
-│   └── seedData.js                   # Initial mock users, assignments, and submissions
-├── hooks/
-│   └── useLocalStorage.js            # Custom hook syncing state with localStorage
-├── pages/
-│   ├── AdminDashboard.jsx            # Admin control center
-│   ├── LoginPage.jsx                 # Mock user picker (Admins & Students)
-│   └── StudentDashboard.jsx          # Student assignment feed & submission workflow
-├── test/
-│   ├── app.test.jsx                  # Vitest unit and integration test suite
-│   └── setup.js                      # Test setup and localStorage polyfill
-├── utils/
-│   ├── constants.js                  # Shared status, roles, and storage constants
-│   └── helpers.js                    # Formatting, date calculations & URL validators
-├── App.jsx                           # Application routing and provider tree
-├── index.css                         # Tailwind CSS directives
-└── main.jsx                          # React application root
-```
+Vitest automated test coverage includes:
+1. `app.test.jsx` — Core routing, fallback redirects, and base layout rendering.
+2. `ui.test.jsx` — Reusable UI library behaviors (variants, focus, modal keyboard traps).
+3. `auth.test.jsx` — Form validation, email duplication checks, token generation, role guards.
+4. `student.test.jsx` — Dashboard course filtering, access barriers, progress calculation.
+5. `acknowledgement.test.jsx` — Individual submission modal confirmation, double-click lock, late badge.
+6. `groups.test.jsx` — Group creation, uniqueness validation, membership joining limits.
+7. `groupAcknowledgement.test.jsx` — Leader-exclusive submission, member synchronization, dialogs.
+8. `professor.test.jsx` — Professor course creation, assignment publishing, edit pre-fill, cascade delete.
+9. `tracking.test.jsx` — Drill-down modal, roster breakdown, real-time search, status filter.
+10. `polishFilters.test.jsx` — Course-level search and filter synergy, empty reset states.
+
+**Result: 67 / 67 passing (100% test pass rate).**
 
 ---
 
-## Component Architecture & Data Flow
-
-```
-+--------------------------------------------------------------------------+
-|                              ThemeProvider                               |
-+--------------------------------------------------------------------------+
-|                              AuthProvider                                |
-+--------------------------------------------------------------------------+
-|                              DataProvider                                |
-+--------------------------------------------------------------------------+
-|                             BrowserRouter                                |
-|                                                                          |
-|   /                 -->  <LoginPage />                                   |
-|   /student          -->  <ProtectedRoute allowedRole="student">          |
-|                               <StudentDashboard />                       |
-|                          </ProtectedRoute>                               |
-|   /admin            -->  <ProtectedRoute allowedRole="admin">            |
-|                               <AdminDashboard />                         |
-|                          </ProtectedRoute>                               |
-+--------------------------------------------------------------------------+
-```
-
-1. **`useLocalStorage`**: Custom hook that reads on initialization with `try/catch` fallback to seed defaults and automatically serializes state updates to `localStorage`.
-2. **`AuthContext`**: Exposes `{ currentUser, login, logout }`. The `ProtectedRoute` component interrogates `currentUser` and redirects unauthorized visits using `{ replace: true }`.
-3. **`DataContext`**: Serves as the single source of truth for assignments and submissions:
-   - Separate state arrays for `assignments` and `submissions`.
-   - Helper methods: `getStudentAssignments`, `getAdminAssignments`, `getStudentSubmission`.
-   - Mutation methods: `submitAssignment`, `createAssignment`, `updateAssignment`, `deleteAssignment`, and `resetData`.
-
----
-
-## Key Design Decisions
-
-1. **Separation of Submissions and Assignments**:
-   - Instead of nesting submission objects directly inside each assignment object, submissions are modeled in an independent collection `{ assignmentId, studentId, status, submittedAt }`.
-   - *Why*: In a class where multiple students are assigned the same project, each student's submission status is distinct. Separating submissions mirrors relational and NoSQL best practices, prevents concurrency conflicts, and makes tracking and pruning clean.
-2. **Context API over Redux/Zustand**:
-   - For an application of this scope, native React Context API (`AuthContext`, `DataContext`, `ThemeContext`) provides simple, predictable state management without extra bundle weight or external dependencies.
-3. **Robust LocalStorage Recovery**:
-   - Any JSON parsing error (e.g. invalid or corrupted data in storage) is caught safely by `useLocalStorage`, falling back to initial seed data and surfacing an `ErrorState` banner with a one-click reset button.
-4. **Mock User Switcher without Passwords**:
-   - For interview assessment and reviewer testing, a mock user picker categorized into Admins and Students eliminates friction while still providing authentic role-based workflows and route guards.
-
----
-
-## Known Limitations
-
-- **Client-Side Only**: All persistence is confined to the local browser's `localStorage`. Opening the application in a different browser or incognito session starts with fresh seed data.
-- **Simulated File Uploads**: The submission flow confirms student completion without accepting binary file uploads (Drive links are used for course materials).
-- **Storage Limits**: `localStorage` has a typical quota of ~5MB, which is more than sufficient for text records but not suited for large binary payloads.
+## 📄 License
+MIT License. Submitted as part of Frontend Internship Assignment (Round 2).

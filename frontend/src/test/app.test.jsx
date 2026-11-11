@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { render, screen, renderHook, act } from '@testing-library/react'
+import App from '../App'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { DataProvider, useData } from '../context/DataContext'
 import { initialUsers, initialCourses, initialAssignments, initialGroups, initialAcknowledgements } from '../data/seedData'
@@ -210,5 +211,12 @@ describe('Phase 1: Restructure & Data Model Test Suite', () => {
       result.current.resetData()
     })
     expect(result.current.getAssignmentById('assign-1')).not.toBeNull()
+  })
+
+  // 13. Top-level App smoke test: verifies provider tree order and default route renders without crashing
+  it('renders top-level App component and mounts login screen without provider order error', () => {
+    render(<App />)
+    expect(screen.getByRole('heading', { name: /Sign in to your account/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument()
   })
 })

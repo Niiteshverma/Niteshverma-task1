@@ -12,8 +12,8 @@ import { ROLES } from './utils/constants'
 
 export default function App() {
   return (
-    <AuthProvider>
-      <DataProvider>
+    <DataProvider>
+      <AuthProvider>
         <ToastProvider>
           <BrowserRouter>
               <Routes>
@@ -61,9 +61,9 @@ export default function App() {
                 {/* Catch-all Fallback */}
                 <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
-          </BrowserRouter>
-        </ToastProvider>
+            </BrowserRouter>
+          </ToastProvider>
+        </AuthProvider>
       </DataProvider>
-    </AuthProvider>
-  )
-}
+    )
+  }

@@ -1,5 +1,5 @@
 // Context managing shared mock database state (users, courses, assignments, groups, acknowledgements)
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { ROLES, STORAGE_KEYS } from '../utils/constants'
 import {
@@ -29,6 +29,20 @@ export function DataProvider({ children }) {
     initialAcknowledgements,
     handleStorageError
   )
+
+  // Auto-sync seed data when credentials or seed version change
+  useEffect(() => {
+    const SEED_VERSION = 'seed_v4_ritesh_priya'
+    const storedVersion = localStorage.getItem('app_seed_version')
+    if (storedVersion !== SEED_VERSION) {
+      setUsers(initialUsers)
+      setCourses(initialCourses)
+      setAssignments(initialAssignments)
+      setGroups(initialGroups)
+      setAcknowledgements(initialAcknowledgements)
+      localStorage.setItem('app_seed_version', SEED_VERSION)
+    }
+  }, [setUsers, setCourses, setAssignments, setGroups, setAcknowledgements])
 
   // Query helpers
   const getUserById = useCallback(

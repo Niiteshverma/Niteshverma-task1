@@ -3,6 +3,7 @@ import { createContext, useContext, useMemo, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { STORAGE_KEYS } from '../utils/constants'
 import { createToken, validateSession } from '../utils/auth'
+import { initialUsers } from '../data/seedData'
 import { useData } from './DataContext'
 
 export const AuthContext = createContext(null)
@@ -25,9 +26,16 @@ export function AuthProvider({ children }) {
 
   const login = (email, password) => {
     const cleanEmail = email ? email.trim().toLowerCase() : ''
-    const user = users.find(
+    let user = users.find(
       (u) => u.email.toLowerCase() === cleanEmail && u.password === password
     )
+
+    // Fallback: If user had an older seed array in localStorage, check initialUsers
+    if (!user) {
+      user = initialUsers.find(
+        (u) => u.email.toLowerCase() === cleanEmail && u.password === password
+      )
+    }
 
     if (!user) {
       return { success: false, error: 'Invalid email or password. Please try again.' }

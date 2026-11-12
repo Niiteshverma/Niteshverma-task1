@@ -78,10 +78,10 @@ describe('Phase 9: Professor Tracking & Drill-down Test Suite', () => {
     expect(screen.getByText(/1 Submitted/i)).toBeInTheDocument()
     expect(screen.getByText(/3 Pending/i)).toBeInTheDocument()
 
-    // Roster checks: Alex Johnson is acknowledged, Beatriz Morales, Charlie Chen, Divya Patel are pending
-    expect(screen.getByText('Alex Johnson')).toBeInTheDocument()
-    expect(screen.getByText('Beatriz Morales')).toBeInTheDocument()
-    expect(screen.getByText('Charlie Chen')).toBeInTheDocument()
+    // Roster checks: Priya Verma is acknowledged, Ashish, Rohit Verma, Divya Patel are pending
+    expect(screen.getByText('Priya Verma')).toBeInTheDocument()
+    expect(screen.getByText('Ashish')).toBeInTheDocument()
+    expect(screen.getByText('Rohit Verma')).toBeInTheDocument()
     expect(screen.getByText('Divya Patel')).toBeInTheDocument()
 
     // Should have Acknowledged badge and Pending badges
@@ -97,12 +97,12 @@ describe('Phase 9: Professor Tracking & Drill-down Test Suite', () => {
     fireEvent.click(trackButtons[0])
 
     const searchInput = await screen.findByPlaceholderText(/Search by student name or email/i)
-    fireEvent.change(searchInput, { target: { value: 'Beatriz' } })
+    fireEvent.change(searchInput, { target: { value: 'Ashish' } })
 
-    // Only Beatriz should match
-    expect(screen.getByText('Beatriz Morales')).toBeInTheDocument()
-    expect(screen.queryByText('Alex Johnson')).not.toBeInTheDocument()
-    expect(screen.queryByText('Charlie Chen')).not.toBeInTheDocument()
+    // Only Ashish should match
+    expect(screen.getByText('Ashish')).toBeInTheDocument()
+    expect(screen.queryByText('Priya Verma')).not.toBeInTheDocument()
+    expect(screen.queryByText('Rohit Verma')).not.toBeInTheDocument()
 
     // Search with no results triggers empty state
     fireEvent.change(searchInput, { target: { value: 'Nonexistent Student' } })
@@ -120,14 +120,14 @@ describe('Phase 9: Professor Tracking & Drill-down Test Suite', () => {
 
     // Filter to Acknowledged only
     fireEvent.change(filterSelect, { target: { value: 'acknowledged' } })
-    expect(screen.getByText('Alex Johnson')).toBeInTheDocument()
-    expect(screen.queryByText('Beatriz Morales')).not.toBeInTheDocument()
+    expect(screen.getByText('Priya Verma')).toBeInTheDocument()
+    expect(screen.queryByText('Ashish')).not.toBeInTheDocument()
 
     // Filter to Pending only
     fireEvent.change(filterSelect, { target: { value: 'pending' } })
-    expect(screen.queryByText('Alex Johnson')).not.toBeInTheDocument()
-    expect(screen.getByText('Beatriz Morales')).toBeInTheDocument()
-    expect(screen.getByText('Charlie Chen')).toBeInTheDocument()
+    expect(screen.queryByText('Priya Verma')).not.toBeInTheDocument()
+    expect(screen.getByText('Ashish')).toBeInTheDocument()
+    expect(screen.getByText('Rohit Verma')).toBeInTheDocument()
   })
 
   it('tracks group assignments with group leader names and member counts', async () => {
@@ -143,7 +143,7 @@ describe('Phase 9: Professor Tracking & Drill-down Test Suite', () => {
 
     // Should display group details in modal
     expect(await screen.findByText('Data Sharding Titans')).toBeInTheDocument()
-    expect(screen.getByText(/Leader: Ethan Wright • 2 members/i)).toBeInTheDocument()
+    expect(screen.getByText(/Leader: Sagar • 2 members/i)).toBeInTheDocument()
   })
 
   it('displays "Late" badge when submission timestamp is past deadline', () => {

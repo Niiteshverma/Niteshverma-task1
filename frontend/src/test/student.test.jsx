@@ -54,7 +54,7 @@ describe('Phase 4: Student Dashboard & Course Assignments Page Test Suite', () =
 
     expect(screen.getByText('Web Architecture & Frontend Systems')).toBeInTheDocument()
     expect(screen.getByText('CS301')).toBeInTheDocument()
-    expect(screen.getByText('Dr. Sarah Jenkins')).toBeInTheDocument()
+    expect(screen.getByText('Dr. Ritesh Verma')).toBeInTheDocument()
     // Course 1 has 3 assignments, student-1 has 1 seed acknowledgement (assign-1)
     expect(screen.getByText('1 of 3 acknowledged')).toBeInTheDocument()
   })

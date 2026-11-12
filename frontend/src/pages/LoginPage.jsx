@@ -147,27 +147,27 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
-                onClick={() => handleQuickFill('student1@demo.com', 'password123')}
+                onClick={() => handleQuickFill('priya@gmail.com', 'password123')}
                 className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-left transition group"
               >
                 <span className="font-bold text-slate-800 group-hover:text-indigo-700 block">
                   Student Demo
                 </span>
                 <span className="text-[11px] text-slate-500 truncate block">
-                  student1@demo.com
+                  priya@gmail.com
                 </span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickFill('professor1@demo.com', 'password123')}
+                onClick={() => handleQuickFill('ritesh@gmail.com', 'password123')}
                 className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-purple-50 hover:border-purple-300 text-left transition group"
               >
                 <span className="font-bold text-slate-800 group-hover:text-purple-700 block">
                   Professor Demo
                 </span>
                 <span className="text-[11px] text-slate-500 truncate block">
-                  professor1@demo.com
+                  ritesh@gmail.com
                 </span>
               </button>
             </div>

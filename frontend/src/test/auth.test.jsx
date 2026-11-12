@@ -65,7 +65,7 @@ describe('Phase 3: Authentication & Token Session Test Suite', () => {
 
     // Invalid credentials
     act(() => {
-      const res = result.current.login('student1@demo.com', 'wrongpassword')
+      const res = result.current.login('priya@gmail.com', 'wrongpassword')
       expect(res.success).toBe(false)
       expect(res.error).toContain('Invalid email or password')
     })
@@ -73,12 +73,12 @@ describe('Phase 3: Authentication & Token Session Test Suite', () => {
 
     // Valid student login (case insensitive and trimmed)
     act(() => {
-      const res = result.current.login('  STUDENT1@demo.com ', 'password123')
+      const res = result.current.login('  PRIYA@gmail.com ', 'password123')
       expect(res.success).toBe(true)
       expect(res.user.role).toBe(ROLES.STUDENT)
     })
     expect(result.current.currentUser).not.toBeNull()
-    expect(result.current.currentUser.name).toBe('Alex Johnson')
+    expect(result.current.currentUser.name).toBe('Priya Verma')
 
     // Logout
     act(() => {
@@ -107,8 +107,8 @@ describe('Phase 3: Authentication & Token Session Test Suite', () => {
     // Reject duplicate email
     act(() => {
       const res = result.current.auth.register({
-        name: 'Alex Duplicate',
-        email: 'student1@demo.com',
+        name: 'Priya Duplicate',
+        email: 'priya@gmail.com',
         password: 'password123',
         role: ROLES.STUDENT,
       })

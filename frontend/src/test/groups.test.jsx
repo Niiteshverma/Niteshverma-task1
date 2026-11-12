@@ -124,7 +124,7 @@ describe('Phase 6: Groups Management Test Suite', () => {
     // Verify modal closes and active group view renders
     expect(await screen.findByText('Algorithm Wizards')).toBeInTheDocument()
     expect(screen.getByText('Leader')).toBeInTheDocument()
-    expect(screen.getByText(/Ethan Wright/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/Sagar/i).length).toBeGreaterThanOrEqual(1)
   })
 
   // 5. Joining an existing group updates members list

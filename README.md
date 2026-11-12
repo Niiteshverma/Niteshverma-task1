@@ -21,11 +21,11 @@ The application delivers tailored role-based workflows for **Students** and **Pr
 
 | Role | Email | Password | Details |
 | :--- | :--- | :--- | :--- |
-| **Student (Leader)** | `student1@demo.com` | `demo123` | Enrolled in CS301, CS401, CS450. Leader of *Frontend Pioneers*. |
-| **Student (Member)** | `student2@demo.com` | `demo123` | Enrolled in CS301, CS305, CS450. Member of *Frontend Pioneers*. |
-| **Student (Unassigned)**| `student5@demo.com` | `demo123` | Enrolled in CS401, CS305, CS450. Unassigned in CS401. |
-| **Professor (Sarah)** | `professor1@demo.com` | `demo123` | Teaches CS301 and CS401. |
-| **Professor (Alan)** | `professor2@demo.com` | `demo123` | Teaches CS305 and CS450. |
+| **Student (Leader)** | `priya@gmail.com` | `password123` | Priya Verma. Enrolled in CS301, CS401, CS450. Leader of *Frontend Pioneers*. |
+| **Student (Member)** | `ashish@gmail.com` | `password123` | Ashish. Enrolled in CS301, CS305, CS450. Member of *Frontend Pioneers*. |
+| **Student (Unassigned)**| `sagar@gmail.com` | `password123` | Sagar. Enrolled in CS401, CS305, CS450. |
+| **Professor (Ritesh)**| `ritesh@gmail.com` | `password123` | Dr. Ritesh Verma. Teaches CS301 and CS401. |
+| **Professor (Anil)**  | `anil@gmail.com`   | `password123` | Prof. Anil Rawat. Teaches CS305 and CS450. |
 
 *You can also register brand-new Student and Professor accounts directly on the `/register` page.*
 

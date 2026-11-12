@@ -79,7 +79,7 @@ describe('Phase 7: Group Acknowledgement Flow Test Suite', () => {
     // Shows leader notice with leader name
     const notice = screen.getByText(/Only the group leader/i)
     expect(notice).toBeInTheDocument()
-    expect(notice.parentElement).toHaveTextContent('Alex Johnson')
+    expect(notice.parentElement).toHaveTextContent('Priya Verma')
     expect(notice.parentElement).toHaveTextContent('can submit for your group')
 
     // Must not show submit button
@@ -132,9 +132,9 @@ describe('Phase 7: Group Acknowledgement Flow Test Suite', () => {
 
     expect(await screen.findByText(/Schema Normalization \(3NF & BCNF\)/i)).toBeInTheDocument()
 
-    // student-6 sees that Ethan Wright (leader) acknowledged it
+    // student-6 sees that Sagar (leader) acknowledged it
     expect(
-      screen.getByText(/Acknowledged by Ethan Wright on/i)
+      screen.getByText(/Acknowledged by Sagar on/i)
     ).toBeInTheDocument()
 
     // No submission button available

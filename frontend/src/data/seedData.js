@@ -4,15 +4,15 @@ export const initialUsers = [
   // 2 Professors
   {
     id: 'prof-1',
-    name: 'Dr. Sarah Jenkins',
-    email: 'professor1@demo.com',
+    name: 'Dr. Ritesh Verma',
+    email: 'ritesh@gmail.com',
     password: 'password123',
     role: 'professor',
   },
   {
     id: 'prof-2',
-    name: 'Prof. Alan Turing',
-    email: 'professor2@demo.com',
+    name: 'Prof. Anil Rawat',
+    email: 'anil@gmail.com',
     password: 'password123',
     role: 'professor',
   },
@@ -20,22 +20,22 @@ export const initialUsers = [
   // 6 Students
   {
     id: 'student-1',
-    name: 'Alex Johnson',
-    email: 'student1@demo.com',
+    name: 'Priya Verma',
+    email: 'priya@gmail.com',
     password: 'password123',
     role: 'student',
   },
   {
     id: 'student-2',
-    name: 'Beatriz Morales',
-    email: 'student2@demo.com',
+    name: 'Ashish',
+    email: 'ashish@gmail.com',
     password: 'password123',
     role: 'student',
   },
   {
     id: 'student-3',
-    name: 'Charlie Chen',
-    email: 'student3@demo.com',
+    name: 'Rohit Verma',
+    email: 'rohit@gmail.com',
     password: 'password123',
     role: 'student',
   },
@@ -48,15 +48,15 @@ export const initialUsers = [
   },
   {
     id: 'student-5',
-    name: 'Ethan Wright',
-    email: 'student5@demo.com',
+    name: 'Sagar',
+    email: 'sagar@gmail.com',
     password: 'password123',
     role: 'student',
   },
   {
     id: 'student-6',
-    name: 'Fiona Gallagher',
-    email: 'student6@demo.com',
+    name: 'Manav',
+    email: 'manav@gmail.com',
     password: 'password123',
     role: 'student',
   },
@@ -94,7 +94,7 @@ export const initialCourses = [
 ]
 
 export const initialAssignments = [
-  // Course 1 assignments (Prof Jenkins)
+  // Course 1 assignments 
   {
     id: 'assign-1',
     courseId: 'course-1',
@@ -126,7 +126,7 @@ export const initialAssignments = [
     createdAt: '2026-10-20T09:00:00.000Z',
   },
 
-  // Course 2 assignments (Prof Jenkins)
+  // Course 2 assignments 
   {
     id: 'assign-4',
     courseId: 'course-2',
@@ -148,7 +148,7 @@ export const initialAssignments = [
     createdAt: '2026-10-18T16:00:00.000Z',
   },
 
-  // Course 3 assignments (Prof Turing)
+  // Course 3 assignments 
   {
     id: 'assign-6',
     courseId: 'course-3',
@@ -221,7 +221,7 @@ export const initialGroups = [
 ]
 
 export const initialAcknowledgements = [
-  // Individual acknowledgement on assign-1 by Alex Johnson
+  // Individual acknowledgement on assign-1 
   {
     id: 'ack-1',
     assignmentId: 'assign-1',
@@ -231,7 +231,7 @@ export const initialAcknowledgements = [
     acknowledgedAt: '2026-10-22T14:30:00.000Z',
   },
 
-  // Group acknowledgement on assign-6 for group-3 by leader Ethan Wright
+  // Group acknowledgement on assign-6 for group-3
   {
     id: 'ack-2',
     assignmentId: 'assign-6',
